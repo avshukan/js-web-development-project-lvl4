@@ -24,3 +24,11 @@ export default (app) => {
       }
     })
 };
+
+
+// export default (app) => {
+//   app
+//     .get('/db', (req, reply) => {
+//       reply.render('pages/db', { results: [ { id: 1, name: 'Hello Heroku!' } ] });
+//     });
+// };
