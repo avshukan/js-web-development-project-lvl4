@@ -13,7 +13,9 @@ export default (app) => {
       try {
         const client = await pool.connect();
         const result = await client.query('SELECT * FROM test_table');
+        console.log('result', result);
         const results = { 'results': (result) ? result.rows : null};
+        console.log('results', results);
         res.render('pages/db', results );
         client.release();
       } catch (err) {
