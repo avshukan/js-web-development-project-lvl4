@@ -62,6 +62,45 @@ describe('test users CRUD', () => {
     expect(user).toMatchObject(expected);
   });
 
+  it('delete', async () => {
+    const params = { id: 1, password: 'O6AvLIQL1cbzrre' };
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('users'),
+      payload: {
+        data: params,
+      },
+    });
+    const user = await models.user.query().findOne({ id: params.id });
+    expect(response.statusCode).toBe(302);
+    expect(user).toBeNull();
+
+    const wrongParams = { id: 1, password: 'wrongPassword' };
+    const expectedWronguser = await models.user.query().findOne({ id: params.id });
+    const wrongResponse = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('users'),
+      payload: {
+        data: wrongParams,
+      },
+    });
+    const wrongUser = await models.user.query().findOne({ id: params.id });
+    expect(wrongResponse.statusCode).toBe(401);
+    expect(wrongUser).toMatchObject(expectedWronguser);
+
+    const badParams = { id: 999, password: '123' };
+    const badResponse = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('users'),
+      payload: {
+        data: badParams,
+      },
+    });
+    const badUser = await models.user.query().findOne({ id: params.id });
+    expect(badResponse.statusCode).toBe(302);
+    expect(badUser).toBeNull();
+  });
+
   afterEach(async () => {
     // после каждого теста откатываем миграции
     await knex.migrate.rollback();

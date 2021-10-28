@@ -23,7 +23,7 @@ module.exports = {
       {
         directory: path.join(__dirname, 'dist', 'public'),
         publicPath: '/assets/',
-      }
+      },
     ],
     port: 8080,
     compress: true,
