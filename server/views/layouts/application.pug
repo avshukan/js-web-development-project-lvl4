@@ -28,7 +28,7 @@ head
     }
     }
   // Custom styles for this template
-  link(href='./sidebars.css' rel='stylesheet')
+  link(href=assetPath('sidebars.css') rel='stylesheet')
 svg(xmlns='http://www.w3.org/2000/svg' style='display: none;')
   symbol#bootstrap(viewbox='0 0 118 94')
     title Bootstrap
@@ -101,7 +101,7 @@ main
           li
             a.dropdown-item(href='#') Settings
           li
-            a.dropdown-item(href='#') Profile
+            a.dropdown-item(href='/users')= t('layouts.application.profile')
           li
             hr.dropdown-divider
           li

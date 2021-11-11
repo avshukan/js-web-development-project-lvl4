@@ -55,23 +55,20 @@ describe('test session', () => {
       method: 'GET',
       url: app.reverse('newSession'),
     });
-
     expect(response.statusCode).toBe(200);
 
-    const responseSignIn = await app.inject({
+    const badResponseSignIn = await app.inject({
       method: 'POST',
       url: app.reverse('session'),
       payload: {
         data: testData.users.new,
       },
     });
-
-    expect(responseSignIn.statusCode).toBe(422);
-    // после успешной аутентификации получаем куки из ответа,
-    // они понадобятся для выполнения запросов на маршруты требующие
-    // предварительную аутентификацию
-    const [sessionCookie] = responseSignIn.cookies;
-    expect(sessionCookie).toStrictEqual({});
+    expect(badResponseSignIn.statusCode).toBe(422);
+    // после ошибочной аутентификации получаем куки из ответа,
+    // куки должны быть пустые
+    // const [sessionCookie] = badResponseSignIn.cookies;
+    // expect(sessionCookie).toStrictEqual({});
   });
 
   afterAll(async () => {

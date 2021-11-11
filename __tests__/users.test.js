@@ -74,7 +74,8 @@ describe('test users CRUD', () => {
     const nonexistentParams = testData.users.nonexistent;
     const nonexistentResponse = await app.inject({
       method: 'GET',
-      url: app.reverse(`users/${nonexistentParams.id}/edit`),
+      url: `/users/${nonexistentParams.id}`,
+      // url: app.reverse(`/users/${nonexistentParams.id}`),
     });
     expect(nonexistentResponse.statusCode).toBe(401);
 
@@ -89,8 +90,9 @@ describe('test users CRUD', () => {
     // они понадобятся для выполнения запросов на маршруты требующие
     // предварительную аутентификацию
     const [sessionCookie] = responseSignIn.cookies;
-    const { id, name, value } = sessionCookie;
-    const cookie = { [name]: value };
+    const { id } = sessionCookie;
+    // const { id, name, value } = sessionCookie;
+    // const cookie = { [name]: value };
 
     const olddataParams = testData.users.olddata;
     const olddataResponse = await app.inject({
@@ -125,9 +127,9 @@ describe('test users CRUD', () => {
         data: badParams,
       },
     });
-    const user = await models.user.query().findOne({ id: id });
+    const user = await models.user.query().findOne({ id });
     expect(badResponse.statusCode).toBe(422);
-    // expect(user).toBeNull();
+    expect(user).toBeNull();
 
     const newResponse = await app.inject({
       method: 'PATCH',
@@ -136,7 +138,7 @@ describe('test users CRUD', () => {
         data: newParams.email,
       },
     });
-    const newUser = await models.user.query().findOne({ id: id });
+    const newUser = await models.user.query().findOne({ id });
     const newEmail = newUser.email;
     const newPasswordDigest = newUser.passwordDigest;
     expect(newResponse.statusCode).toBe(302);
@@ -153,7 +155,7 @@ describe('test users CRUD', () => {
         data: params,
       },
     });
-    const user = await models.user.query().findOne({ id: params.id });
+    const user = await models.user.query().findById(params.id);
     expect(response.statusCode).toBe(302);
     expect(user).toBeNull();
 
