@@ -47,19 +47,37 @@ module.exports = {
         new: {
           signIn: 'Вход',
           submit: 'Войти',
+          labels: {
+            email: 'Email',
+            password: 'Пароль',
+          }
         },
       },
       users: {
         id: 'ID',
         email: 'Email',
         createdAt: 'Дата создания',
+        update: 'Редактировать',
+        delete: 'Удалить',
         new: {
           submit: 'Сохранить',
           signUp: 'Регистрация',
+          labels: {
+            firstName: 'Имя',
+            lastName: 'Фамилия',
+            email: 'Email',
+            password: 'Пароль',
+          }
         },
         edit: {
           submit: 'Сохранить',
           edit: 'Редактирование',
+          labels: {
+            firstName: 'Имя',
+            lastName: 'Фамилия',
+            email: 'Email',
+            password: 'Пароль',
+          }
         },
       },
       welcome: {

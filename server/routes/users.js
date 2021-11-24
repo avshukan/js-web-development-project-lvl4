@@ -15,12 +15,17 @@ export default (app) => {
     })
     .post('/users', { name: 'create user' }, async (req, reply) => {
       try {
+        console.log('req.body.data', req.body.data);
         const user = await app.objection.models.user.fromJson(req.body.data);
-        await app.objection.models.user.query().insert(user);
+        console.log('user', user);
+        const inserted = await app.objection.models.user.query().insert(user);
+        console.log('inserted', inserted);
         req.flash('info', i18next.t('flash.users.create.success'));
         reply.redirect(app.reverse('root'));
         return reply;
-      } catch ({ data }) {
+      } catch (error) {
+        console.log('error', error);
+        const { data } = error;
         req.flash('error', i18next.t('flash.users.create.error'));
         reply.statusCode = 422;
         reply.render('users/new', { user: req.body.data, errors: data });
@@ -42,16 +47,16 @@ export default (app) => {
     .patch('/users/:id', { name: 'update user' }, async (req, reply) => {
       try {
         const { id } = req.params;
-        console.log('id', typeof id, id);
-        if (id === '999') {
+        if (id !== reply.locals?.passport?.id) {
           req.flash('error', i18next.t('flash.users.update.error'));
           req.flash('error', i18next.t('flash.users.update.unauthorized'));
-          reply.statusCode = 401;
+          reply.statusCode = 403;
           reply.render(`users/${id}/edit`, { user: req.body.data, errors: {} });
           return reply;
         }
         const user = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().findById(id).patch(user);
+        reply.statusCode = 204;
         reply.render(`users/${id}`, { user, errors: {} });
         return reply;
       } catch ({ data }) {
@@ -63,8 +68,20 @@ export default (app) => {
     })
     .delete('/users/:id', { name: 'delete user' }, async (req, reply) => {
       const { id } = req.params;
-      await app.objection.models.user.query().deleteById(id);
-      reply.redirect(app.reverse('root'));
+      try {
+        console.log("req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport']", req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport']);
+      } catch(e) {
+        console.log("can't req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport']");
+      }
+      if (id !== reply.locals?.passport?.id) {
+        req.flash('error', i18next.t('flash.users.delete.error'));
+        req.flash('error', i18next.t('flash.users.delete.unauthorized'));
+        reply.statusCode = 403;
+      } else {
+        await app.objection.models.user.query().deleteById(id);
+      }
+      const users = await app.objection.models.user.query();
+      reply.render('users/index', { users });
       return reply;
     });
 };
