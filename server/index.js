@@ -80,6 +80,7 @@ const addHooks = (app) => {
   app.addHook('preHandler', async (req, reply) => {
     reply.locals = {
       isAuthenticated: () => req.isAuthenticated(),
+      passport: req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport'],
     };
   });
 };
