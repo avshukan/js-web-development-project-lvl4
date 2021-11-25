@@ -34,6 +34,10 @@ export default (app) => {
     })
     .get('/users/:id/edit', { name: 'read for update user' }, async (req, reply) => {
       const { id } = req.params;
+      if (!reply.locals?.passport?.id || id !== reply.locals?.passport?.id) {
+        req.flash('error', i18next.t('flash.users.update.unauthorized'));
+        return reply.redirect(app.reverse('root'));
+      }
       const user = await app.objection.models.user.query().findById(id);
       reply.render('users/edit', { user, errors: {} });
       return reply;
@@ -47,12 +51,12 @@ export default (app) => {
     .patch('/users/:id', { name: 'update user' }, async (req, reply) => {
       try {
         const { id } = req.params;
-        if (id !== reply.locals?.passport?.id) {
+        if (!reply.locals?.passport?.id || id !== reply.locals?.passport?.id) {
           req.flash('error', i18next.t('flash.users.update.error'));
           req.flash('error', i18next.t('flash.users.update.unauthorized'));
-          reply.statusCode = 403;
-          reply.render(`users/${id}/edit`, { user: req.body.data, errors: {} });
-          return reply;
+          // reply.statusCode = 403;
+          // reply.render(`users/${id}/edit`, { user: req.body.data, errors: {} });
+          return reply.redirect(app.reverse('root'));
         }
         const user = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().findById(id).patch(user);
@@ -73,13 +77,13 @@ export default (app) => {
       } catch(e) {
         console.log("can't req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport']");
       }
-      if (id !== reply.locals?.passport?.id) {
+      if (!reply.locals?.passport?.id || id !== reply.locals?.passport?.id) {
         req.flash('error', i18next.t('flash.users.delete.error'));
         req.flash('error', i18next.t('flash.users.delete.unauthorized'));
-        reply.statusCode = 403;
-      } else {
-        await app.objection.models.user.query().deleteById(id);
+        // reply.statusCode = 403;
+        return reply.redirect(app.reverse('root'));
       }
+      await app.objection.models.user.query().deleteById(id);
       const users = await app.objection.models.user.query();
       reply.render('users/index', { users });
       return reply;
