@@ -45,6 +45,9 @@ export default (app) => {
     .get('/users/:id', { name: 'read user' }, async (req, reply) => {
       const { id } = req.params;
       const user = await app.objection.models.user.query().findById(id);
+      if (!user) {
+        return reply.notFound();
+      }
       reply.render('users/edit', { user, errors: {} });
       return reply;
     })

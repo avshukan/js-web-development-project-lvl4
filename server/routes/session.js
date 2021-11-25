@@ -26,6 +26,7 @@ export default (app) => {
       console.log('user after', user);
       req.flash('success', i18next.t('flash.session.create.success'));
       reply.setCookie('user', JSON.stringify(user));
+      reply.setCookie('id', user.id);
       return reply.redirect(app.reverse('root'));
     }))
     .delete('/session', (req, reply) => {

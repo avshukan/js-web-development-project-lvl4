@@ -71,14 +71,16 @@ describe('test users CRUD', () => {
   });
 
   it('edit', async () => {
+    console.log('nonexistent');
     const nonexistentParams = testData.users.nonexistent;
     const nonexistentResponse = await app.inject({
       method: 'GET',
       url: `/users/${nonexistentParams.id}`,
       // url: app.reverse(`/users/${nonexistentParams.id}`),
     });
-    expect(nonexistentResponse.statusCode).toBe(401);
+    expect(nonexistentResponse.statusCode).toBe(404);
 
+    console.log('authorizing');
     const responseSignIn = await app.inject({
       method: 'POST',
       url: app.reverse('session'),
@@ -86,21 +88,18 @@ describe('test users CRUD', () => {
         data: testData.users.olddata,
       },
     });
-    // после успешной аутентификации получаем куки из ответа,
-    // они понадобятся для выполнения запросов на маршруты требующие
-    // предварительную аутентификацию
-    const [sessionCookie] = responseSignIn.cookies;
-    const { id } = sessionCookie;
-    // const { id, name, value } = sessionCookie;
-    // const cookie = { [name]: value };
+    const cookies = responseSignIn.cookies;
+    const { value: id } = cookies.filter((item) => item.name === 'id')[0];
 
-    const olddataParams = testData.users.olddata;
+    console.log('updating');
     const olddataResponse = await app.inject({
       method: 'GET',
-      url: app.reverse(`users/${olddataParams.id}/edit`),
+      // url: app.reverse(`users/${id}/edit`),
+      url: `users/${id}/edit`,
     });
     expect(olddataResponse.statusCode).toBe(200);
 
+    console.log('unauthorized');
     // добавить обновление данных
     // PATCH /users/:id - обновление пользователя
     // 302 - успешное обновление с переадресацией (куда?)
@@ -110,7 +109,8 @@ describe('test users CRUD', () => {
     const newParams = testData.users.newdata;
     const unauthorizedResponse = await app.inject({
       method: 'PATCH',
-      url: app.reverse(`users/${unauthorizedId}/edit`),
+      // url: app.reverse(`users/${unauthorizedId}/edit`),
+      url: `users/${unauthorizedId}/edit`,
       payload: {
         data: newParams,
       },
@@ -122,7 +122,8 @@ describe('test users CRUD', () => {
     const badParams = {};
     const badResponse = await app.inject({
       method: 'PATCH',
-      url: app.reverse(`users/${id}/edit`),
+      // url: app.reverse(`users/${id}/edit`),
+      url: `users/${id}/edit`,
       payload: {
         data: badParams,
       },
@@ -133,7 +134,8 @@ describe('test users CRUD', () => {
 
     const newResponse = await app.inject({
       method: 'PATCH',
-      url: app.reverse(`users/${id}/edit`),
+      // url: app.reverse(`users/${id}/edit`),
+      url: `users/${id}/edit`,
       payload: {
         data: newParams.email,
       },
@@ -147,16 +149,18 @@ describe('test users CRUD', () => {
   });
 
   it('delete', async () => {
+    const users = await models.user.query();
+    const deletedUser = users[0];
+
+    console.log('UNAUTHORIZED DELETED');
     const params = { id: 1, password: 'O6AvLIQL1cbzrre' };
     const response = await app.inject({
       method: 'DELETE',
-      url: app.reverse('users'),
-      payload: {
-        data: params,
-      },
+      // url: app.reverse('users'),
+      url: `users/${deletedUser.id}`,
     });
     const user = await models.user.query().findById(params.id);
-    expect(response.statusCode).toBe(302);
+    expect(response.statusCode).toBe(404);
     expect(user).toBeNull();
 
     const wrongParams = { id: 1, password: 'wrongPassword' };
