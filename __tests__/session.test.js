@@ -50,6 +50,27 @@ describe('test session', () => {
     expect(responseSignOut.statusCode).toBe(302);
   });
 
+  it('test bad sign in', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: app.reverse('newSession'),
+    });
+    expect(response.statusCode).toBe(200);
+
+    const badResponseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: testData.users.new,
+      },
+    });
+    expect(badResponseSignIn.statusCode).toBe(422);
+    // после ошибочной аутентификации получаем куки из ответа,
+    // куки должны быть пустые
+    // const [sessionCookie] = badResponseSignIn.cookies;
+    // expect(sessionCookie).toStrictEqual({});
+  });
+
   afterAll(async () => {
     await knex.migrate.rollback();
     app.close();

@@ -13,3 +13,10 @@ block content
           td= user.id
           td= user.email
           td= formatDate(user.createdAt)
+          td
+            //- +buttonTo(route('users/' + user.id), 'delete')(class="btn nav-link" value=t('views.users.list.delete'))
+            //- a(href='users/' + user.id + '/edit' class="btn nav-link")= t('views.users.edit'))
+            a(href='users/' + user.id + '/edit' class="btn nav-link")= t('views.users.update')
+          td
+            //- +buttonTo(route('users/' + user.id), 'delete')(class="btn nav-link" value=t('views.users.list.delete'))
+            +buttonTo('users/' + user.id, 'delete')(class="btn nav-link" value=t('views.users.delete'))

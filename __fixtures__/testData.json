@@ -7,6 +7,19 @@
     "existing": {
       "email": "lawrence.kulas87@outlook.com",
       "password": "O6AvLIQL1cbzrre"
+    },
+    "nonexistent": {
+      "id": 999,
+      "email": "alexander.pushkin@gmail.com",
+      "password": "Ruslan&Ludmila"
+    },
+    "olddata": {
+      "email": "lawrence.kulas87@outlook.com",
+      "password": "O6AvLIQL1cbzrre"
+    },
+    "newdata": {
+      "email": "lawrence.kulas87@outlook.com",
+      "password": "O6AvLIQL1cbzrre"
     }
   }
 }

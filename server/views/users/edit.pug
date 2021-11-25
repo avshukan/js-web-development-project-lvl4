@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block header
-  = t('views.users.new.signUp')
+  = t('views.users.edit.edit')
 
 block content
   +formFor()(action=route('users') method='post')
@@ -9,4 +9,4 @@ block content
     +input(user, 'lastName', t('views.users.new.labels.lastName'), errors)(type="text")
     +input(user, 'email', t('views.users.new.labels.email'), errors)(type="text")
     +input(user, 'password', t('views.users.new.labels.password'), errors)(type="password")
-    +submit(user)(value=t('views.users.new.submit'))
+    +submit(user)(value=t('views.users.edit.submit'))
