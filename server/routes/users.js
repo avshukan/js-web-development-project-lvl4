@@ -4,12 +4,12 @@ import i18next from 'i18next';
 
 export default (app) => {
   app
-    .get('/users', { name: 'users' }, async (_req, reply) => {
+    .get('/users', { name: 'page of users list' }, async (_req, reply) => {
       const users = await app.objection.models.user.query();
       reply.render('users/index', { users });
       return reply;
     })
-    .get('/users/new', { name: 'newUser' }, (_req, reply) => {
+    .get('/users/new', { name: 'page to create user' }, (_req, reply) => {
       const user = new app.objection.models.user();
       reply.render('users/new', { user });
     })
@@ -32,8 +32,10 @@ export default (app) => {
         return reply;
       }
     })
-    .get('/users/:id/edit', { name: 'read for update user' }, async (req, reply) => {
+    .get('/users/:id/edit', { name: 'page to update user' }, async (req, reply) => {
       const { id } = req.params;
+      // const cookie_id = req.session.get('id');
+      // console.log('cookie_id', cookie_id);
       if (!reply.locals?.passport?.id || id !== reply.locals?.passport?.id) {
         req.flash('error', i18next.t('flash.users.update.unauthorized'));
         return reply.redirect(app.reverse('root'));
@@ -42,7 +44,7 @@ export default (app) => {
       reply.render('users/edit', { user, errors: {} });
       return reply;
     })
-    .get('/users/:id', { name: 'read user' }, async (req, reply) => {
+    .get('/users/:id', { name: 'page of user info' }, async (req, reply) => {
       const { id } = req.params;
       const user = await app.objection.models.user.query().findById(id);
       if (!user) {
@@ -57,8 +59,6 @@ export default (app) => {
         if (!reply.locals?.passport?.id || id !== reply.locals?.passport?.id) {
           req.flash('error', i18next.t('flash.users.update.error'));
           req.flash('error', i18next.t('flash.users.update.unauthorized'));
-          // reply.statusCode = 403;
-          // reply.render(`users/${id}/edit`, { user: req.body.data, errors: {} });
           return reply.redirect(app.reverse('root'));
         }
         const user = await app.objection.models.user.fromJson(req.body.data);
@@ -76,14 +76,13 @@ export default (app) => {
     .delete('/users/:id', { name: 'delete user' }, async (req, reply) => {
       const { id } = req.params;
       try {
-        console.log("req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport']", req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport']);
-      } catch(e) {
+        console.log("req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport']", req.session[Object.getOwnPropertySymbols(req.session)[0]].passport);
+      } catch (e) {
         console.log("can't req.session[Object.getOwnPropertySymbols(req.session)[0]]['passport']");
       }
       if (!reply.locals?.passport?.id || id !== reply.locals?.passport?.id) {
         req.flash('error', i18next.t('flash.users.delete.error'));
         req.flash('error', i18next.t('flash.users.delete.unauthorized'));
-        // reply.statusCode = 403;
         return reply.redirect(app.reverse('root'));
       }
       await app.objection.models.user.query().deleteById(id);

@@ -28,7 +28,7 @@ describe('test users CRUD', () => {
   it('index', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('users'),
+      url: app.reverse('page of users list'),
     });
     expect(response.statusCode).toBe(200);
   });
@@ -36,7 +36,7 @@ describe('test users CRUD', () => {
   it('new', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('newUser'),
+      url: app.reverse('page to create user'),
     });
     expect(response.statusCode).toBe(200);
   });
@@ -45,7 +45,7 @@ describe('test users CRUD', () => {
     const params = testData.users.new;
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('users'),
+      url: app.reverse('create user'),
       payload: {
         data: params,
       },
@@ -62,7 +62,7 @@ describe('test users CRUD', () => {
     const existingParams = testData.users.existing;
     const existingResponse = await app.inject({
       method: 'POST',
-      url: app.reverse('users'),
+      url: app.reverse('create user'),
       payload: {
         data: existingParams,
       },
@@ -75,8 +75,7 @@ describe('test users CRUD', () => {
     const nonexistentParams = testData.users.nonexistent;
     const nonexistentResponse = await app.inject({
       method: 'GET',
-      url: `/users/${nonexistentParams.id}`,
-      // url: app.reverse(`/users/${nonexistentParams.id}`),
+      url: app.reverse('page of user info', { id: nonexistentParams.id }),
     });
     expect(nonexistentResponse.statusCode).toBe(404);
 
@@ -88,14 +87,22 @@ describe('test users CRUD', () => {
         data: testData.users.olddata,
       },
     });
-    const cookies = responseSignIn.cookies;
-    const { value: id } = cookies.filter((item) => item.name === 'id')[0];
+    // после успешной аутентификации получаем куки из ответа,
+    // они понадобятся для выполнения запросов на маршруты требующие
+    // предварительную аутентификацию
+    const [sessionCookie] = responseSignIn.cookies;
+    console.log('sessionCookie', sessionCookie);
+    const { name, value } = sessionCookie;
+    const cookies = { [name]: value };
+    // const cookies = responseSignIn.cookies;
+    const { value: id } = sessionCookie.filter((item) => item.name === 'id')[0];
 
     console.log('updating');
     const olddataResponse = await app.inject({
       method: 'GET',
-      // url: app.reverse(`users/${id}/edit`),
-      url: `users/${id}/edit`,
+      url: app.reverse('page to update user', { id }),
+      // используем полученные ранее куки
+      cookies,
     });
     expect(olddataResponse.statusCode).toBe(200);
 
@@ -109,8 +116,7 @@ describe('test users CRUD', () => {
     const newParams = testData.users.newdata;
     const unauthorizedResponse = await app.inject({
       method: 'PATCH',
-      // url: app.reverse(`users/${unauthorizedId}/edit`),
-      url: `users/${unauthorizedId}/edit`,
+      url: app.reverse('update user', { id: unauthorizedId }),
       payload: {
         data: newParams,
       },
@@ -122,8 +128,7 @@ describe('test users CRUD', () => {
     const badParams = {};
     const badResponse = await app.inject({
       method: 'PATCH',
-      // url: app.reverse(`users/${id}/edit`),
-      url: `users/${id}/edit`,
+      url: app.reverse('update user', { id }),
       payload: {
         data: badParams,
       },
@@ -134,8 +139,7 @@ describe('test users CRUD', () => {
 
     const newResponse = await app.inject({
       method: 'PATCH',
-      // url: app.reverse(`users/${id}/edit`),
-      url: `users/${id}/edit`,
+      url: app.reverse('update user', { id }),
       payload: {
         data: newParams.email,
       },
@@ -156,8 +160,7 @@ describe('test users CRUD', () => {
     const params = { id: 1, password: 'O6AvLIQL1cbzrre' };
     const response = await app.inject({
       method: 'DELETE',
-      // url: app.reverse('users'),
-      url: `users/${deletedUser.id}`,
+      url: app.reverse('delete users', { id: deletedUser.id }),
     });
     const user = await models.user.query().findById(params.id);
     expect(response.statusCode).toBe(404);
@@ -167,10 +170,7 @@ describe('test users CRUD', () => {
     const expectedWronguser = await models.user.query().findOne({ id: params.id });
     const wrongResponse = await app.inject({
       method: 'DELETE',
-      url: app.reverse('users'),
-      payload: {
-        data: wrongParams,
-      },
+      url: app.reverse('delete users', { id: wrongParams.id }),
     });
     const wrongUser = await models.user.query().findOne({ id: params.id });
     expect(wrongResponse.statusCode).toBe(401);
@@ -179,10 +179,7 @@ describe('test users CRUD', () => {
     const badParams = { id: 999, password: '123' };
     const badResponse = await app.inject({
       method: 'DELETE',
-      url: app.reverse('users'),
-      payload: {
-        data: badParams,
-      },
+      url: app.reverse('delete users', { id: badParams.id }),
     });
     const badUser = await models.user.query().findOne({ id: params.id });
     expect(badResponse.statusCode).toBe(422);

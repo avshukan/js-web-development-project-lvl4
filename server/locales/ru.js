@@ -51,7 +51,7 @@ module.exports = {
           labels: {
             email: 'Email',
             password: 'Пароль',
-          }
+          },
         },
       },
       users: {
@@ -68,7 +68,7 @@ module.exports = {
             lastName: 'Фамилия',
             email: 'Email',
             password: 'Пароль',
-          }
+          },
         },
         edit: {
           submit: 'Сохранить',
@@ -78,7 +78,7 @@ module.exports = {
             lastName: 'Фамилия',
             email: 'Email',
             password: 'Пароль',
-          }
+          },
         },
       },
       welcome: {

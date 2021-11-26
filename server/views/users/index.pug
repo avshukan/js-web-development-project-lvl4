@@ -14,9 +14,6 @@ block content
           td= user.email
           td= formatDate(user.createdAt)
           td
-            //- +buttonTo(route('users/' + user.id), 'delete')(class="btn nav-link" value=t('views.users.list.delete'))
-            //- a(href='users/' + user.id + '/edit' class="btn nav-link")= t('views.users.edit'))
-            a(href='users/' + user.id + '/edit' class="btn nav-link")= t('views.users.update')
+            a(href=route('page to update user', {id: user.id}) class="btn nav-link")= t('views.users.update')
           td
-            //- +buttonTo(route('users/' + user.id), 'delete')(class="btn nav-link" value=t('views.users.list.delete'))
-            +buttonTo('users/' + user.id, 'delete')(class="btn nav-link" value=t('views.users.delete'))
+            +buttonTo(route('delete user', {id: '5'}), 'delete')(class="btn nav-link" value=t('views.users.delete'))

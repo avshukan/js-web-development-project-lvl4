@@ -80,7 +80,7 @@ main
     hr
     ul.nav.nav-pills.flex-column.mb-auto
       li.nav-item
-        a.nav-link.active(href=route('users') aria-current='page')
+        a.nav-link.active(href=route('page of users list') aria-current='page')
           svg.bi.me-2(width='16' height='16')
             use(xlink:href='#people-circle')
           = t('layouts.application.users')
@@ -101,7 +101,7 @@ main
           li
             a.dropdown-item(href='#') Settings
           li
-            a.dropdown-item(href='/users')= t('layouts.application.profile')
+            a.dropdown-item(href=route('page of users list'))= t('layouts.application.profile')
           li
             hr.dropdown-divider
           li
@@ -110,7 +110,7 @@ main
           li
             a.dropdown-item(href=route('newSession'))= t('layouts.application.signIn')
           li
-            a.dropdown-item(href=route('newUser'))= t('layouts.application.signUp')
+            a.dropdown-item(href=route('page to create user'))= t('layouts.application.signUp')
   .b-example-divider
 
   each messages, type in reply.flash() || []
