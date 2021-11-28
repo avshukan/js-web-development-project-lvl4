@@ -34,9 +34,8 @@ export default (app) => {
     })
     .get('/users/:id/edit', { name: 'page to update user' }, async (req, reply) => {
       const { id } = req.params;
-      // const cookie_id = req.session.get('id');
-      // console.log('cookie_id', cookie_id);
-      if (!reply.locals?.passport?.id || id !== reply.locals?.passport?.id) {
+      const cookieId = req.session.get('id');
+      if (!cookieId || cookieId !== id) {
         req.flash('error', i18next.t('flash.users.update.unauthorized'));
         return reply.redirect(app.reverse('root'));
       }
@@ -56,17 +55,21 @@ export default (app) => {
     .patch('/users/:id', { name: 'update user' }, async (req, reply) => {
       try {
         const { id } = req.params;
-        if (!reply.locals?.passport?.id || id !== reply.locals?.passport?.id) {
+        const cookieId = req.session.get('id');
+        if (!cookieId || cookieId !== id) {
           req.flash('error', i18next.t('flash.users.update.error'));
           req.flash('error', i18next.t('flash.users.update.unauthorized'));
           return reply.redirect(app.reverse('root'));
         }
         const user = await app.objection.models.user.fromJson(req.body.data);
+        console.log('patch user', user);
         await app.objection.models.user.query().findById(id).patch(user);
         reply.statusCode = 204;
         reply.render(`users/${id}`, { user, errors: {} });
         return reply;
-      } catch ({ data }) {
+      } catch (error) {
+        const { data } = error;
+        console.log('patch error', error);
         req.flash('error', i18next.t('flash.users.delete.error'));
         reply.statusCode = 422;
         reply.render('users/new', { user: req.body.data, errors: data });

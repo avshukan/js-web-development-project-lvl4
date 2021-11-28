@@ -25,7 +25,7 @@ describe('test users CRUD', () => {
     await prepareData(app);
   });
 
-  it('index', async () => {
+  it('page list success', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('page of users list'),
@@ -33,7 +33,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('new', async () => {
+  it('page new success', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('page to create user'),
@@ -41,7 +41,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('create', async () => {
+  it('create user success', async () => {
     const params = testData.users.new;
     const response = await app.inject({
       method: 'POST',
@@ -50,7 +50,6 @@ describe('test users CRUD', () => {
         data: params,
       },
     });
-
     expect(response.statusCode).toBe(302);
     const expected = {
       ..._.omit(params, 'password'),
@@ -58,7 +57,9 @@ describe('test users CRUD', () => {
     };
     const user = await models.user.query().findOne({ email: params.email });
     expect(user).toMatchObject(expected);
+  });
 
+  it('create user fail', async () => {
     const existingParams = testData.users.existing;
     const existingResponse = await app.inject({
       method: 'POST',
@@ -70,7 +71,57 @@ describe('test users CRUD', () => {
     expect(existingResponse.statusCode).toBe(422);
   });
 
-  it('edit', async () => {
+  test.todo('create user with empty attributes -> fail');
+
+  it('edit user success', async () => {
+    const oldParams = testData.users.olddata;
+    const newParams = testData.users.newdata;
+    const oldUser = await models.user.query().findOne({ email: oldParams.email });
+    // авторизация
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: oldParams,
+      },
+    });
+    expect(responseSignIn.statusCode).toBe(302);
+    // после успешной аутентификации получаем куки из ответа,
+    // они понадобятся для выполнения запросов на маршруты требующие
+    // предварительную аутентификацию
+    const [sessionCookie] = responseSignIn.cookies;
+    console.log('sessionCookie', sessionCookie);
+    const { name, value } = sessionCookie;
+    const cookies = { [name]: value };
+
+    console.log('updating');
+    const olddataResponse = await app.inject({
+      method: 'GET',
+      url: app.reverse('page to update user', { id: oldUser.id }),
+      // используем полученные ранее куки
+      cookies,
+    });
+    expect(olddataResponse.statusCode).toBe(302);
+
+    const newdataResponse = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('update user', { id: oldUser.id }),
+      payload: {
+        data: newParams,
+      },
+      // используем полученные ранее куки
+      cookies,
+    });
+    const newUser = await models.user.query().findOne({ id: oldUser.id });
+    const expectedNewUser = {
+      ..._.omit(newParams, 'password'),
+      passwordDigest: encrypt(newParams.password),
+    };
+    expect(newdataResponse.statusCode).toBe(204);
+    expect(newUser).toMatchObject(expectedNewUser);
+  });
+
+  it('edit user fail', async () => {
     console.log('nonexistent');
     const nonexistentParams = testData.users.nonexistent;
     const nonexistentResponse = await app.inject({
