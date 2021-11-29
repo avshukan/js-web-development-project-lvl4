@@ -17,7 +17,7 @@ export default (app) => {
       try {
         const user = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().insert(user);
-        req.flash('info', i18next.t('flash.users.create.success'));
+        req.flash('success', i18next.t('flash.users.create.success'));
         reply.redirect(app.reverse('root'));
         return reply;
       } catch (error) {
@@ -61,9 +61,8 @@ export default (app) => {
         }
         const user = await app.objection.models.user.query().findById(id);
         await user.$query().update(data);
-        req.flash('error', i18next.t('flash.users.update.success'));
-        reply.statusCode = 204;
-        reply.render('users/edit', { user: { ...req.body.data, id }, errors: {} });
+        req.flash('success', i18next.t('flash.users.update.success'));
+        reply.redirect(app.reverse('page of users list'));
         return reply;
       } catch (error) {
         console.log('patch error', error);
@@ -83,6 +82,7 @@ export default (app) => {
       }
       await app.objection.models.user.query().deleteById(id);
       const users = await app.objection.models.user.query();
+      req.flash('success', i18next.t('flash.users.delete.success'));
       reply.render('users/index', { users });
       return reply;
     });

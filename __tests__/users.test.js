@@ -115,7 +115,7 @@ describe('test users CRUD', () => {
       ..._.omit(newParams, 'password'),
       passwordDigest: encrypt(newParams.password),
     };
-    expect(newdataResponse.statusCode).toBe(204);
+    expect(newdataResponse.statusCode).toBe(302);
     expect(newUser).toMatchObject(expectedNewUser);
   });
 
