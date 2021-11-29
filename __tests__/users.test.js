@@ -90,18 +90,16 @@ describe('test users CRUD', () => {
     // они понадобятся для выполнения запросов на маршруты требующие
     // предварительную аутентификацию
     const [sessionCookie] = responseSignIn.cookies;
-    console.log('sessionCookie', sessionCookie);
     const { name, value } = sessionCookie;
     const cookies = { [name]: value };
 
-    console.log('updating');
     const olddataResponse = await app.inject({
       method: 'GET',
       url: app.reverse('page to update user', { id: oldUser.id }),
       // используем полученные ранее куки
       cookies,
     });
-    expect(olddataResponse.statusCode).toBe(302);
+    expect(olddataResponse.statusCode).toBe(200);
 
     const newdataResponse = await app.inject({
       method: 'PATCH',
@@ -142,11 +140,8 @@ describe('test users CRUD', () => {
     // они понадобятся для выполнения запросов на маршруты требующие
     // предварительную аутентификацию
     const [sessionCookie] = responseSignIn.cookies;
-    console.log('sessionCookie', sessionCookie);
     const { name, value } = sessionCookie;
     const cookies = { [name]: value };
-    // const cookies = responseSignIn.cookies;
-    const { value: id } = sessionCookie.filter((item) => item.name === 'id')[0];
 
     console.log('updating');
     const olddataResponse = await app.inject({

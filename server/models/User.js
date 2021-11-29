@@ -5,7 +5,10 @@ import objectionUnique from 'objection-unique';
 
 import encrypt from '../lib/secure.js';
 
-const unique = objectionUnique({ fields: ['email'] });
+const unique = objectionUnique({
+  fields: ['email'],
+  identifiers: ['id'],
+});
 
 export default class User extends unique(Model) {
   static get tableName() {
