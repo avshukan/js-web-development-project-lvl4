@@ -30,6 +30,12 @@
       "firstName": "godunov",
       "email": "lawrence.kulas87@outlook.com",
       "password": "O6AvLIQL1cbzrre"
+    },
+    "duplicateemaildata": {
+      "firstName": "nona",
+      "lastName": "murray",
+      "email": "nona_murray@yahoo.com",
+      "password": "unknown"
     }
   }
 }

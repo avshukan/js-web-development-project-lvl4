@@ -80,10 +80,15 @@ export default (app) => {
         req.flash('error', i18next.t('flash.users.delete.unauthorized'));
         return reply.redirect(app.reverse('root'));
       }
-      await app.objection.models.user.query().deleteById(id);
-      const users = await app.objection.models.user.query();
-      req.flash('success', i18next.t('flash.users.delete.success'));
-      reply.render('users/index', { users });
-      return reply;
+      try {
+        await app.objection.models.user.query().deleteById(id);
+        req.flash('success', i18next.t('flash.users.delete.success'));
+        reply.redirect(app.reverse('page of users list'));
+        return reply;
+      } catch (error) {
+        req.flash('error', i18next.t('flash.users.delete.error'));
+        reply.redirect(app.reverse('page of users list'));
+        return reply;
+      }
     });
 };
