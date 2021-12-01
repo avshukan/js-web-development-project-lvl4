@@ -1,7 +1,6 @@
 // @ts-check
 
 // import _ from 'lodash';
-import { toUnicode } from 'punycode';
 import getApp from '../server/index.js';
 // import encrypt from '../server/lib/secure.js';
 import { getTestData, prepareData } from './helpers/index.js';
@@ -27,10 +26,45 @@ describe('test statuses CRUD', () => {
   });
 
   describe('test statuses create', () => {
-    test.todo('success: create new status');
+    // test.todo('success: create new status');
     test.todo('fail: create new status without auth');
     test.todo('fail: create new nonuniq name');
     test.todo('fail: create new empty name');
+
+    it('success: create new status', async () => {
+      // авторизация
+      const authParams = testData.users.olddata;
+      const authResponse = await app.inject({
+        method: 'POST',
+        url: app.reverse('session'),
+        payload: {
+          data: authParams,
+        },
+      });
+      expect(authResponse.statusCode).toBe(302);
+      // после успешной аутентификации получаем куки из ответа,
+      // они понадобятся для выполнения запросов на маршруты требующие
+      // предварительную аутентификацию
+      const [sessionCookie] = authResponse.cookies;
+      const { name, value } = sessionCookie;
+      const cookies = { [name]: value };
+
+      const oldCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      const newStatusParams = testData.statuses.new;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create session'),
+        payload: {
+          data: newStatusParams,
+        },
+        cookies,
+      });
+      const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      const newStatus = await models.statuses.query().findOne({ name: newStatusParams.name });
+      expect(response.statusCode).toBe(302);
+      expect(newCount).toBe(oldCount + 1);
+      expect(newStatus).toMatchObject(newStatusParams);
+    });
   });
 
   describe('test statuses read', () => {
@@ -54,13 +88,6 @@ describe('test statuses CRUD', () => {
     test.todo('fail: delete status with nonexistent id');
   });
 
-  // it('page list success', async () => {
-  //   const response = await app.inject({
-  //     method: 'GET',
-  //     url: app.reverse('page of users list'),
-  //   });
-  //   expect(response.statusCode).toBe(200);
-  // });
   afterEach(async () => {
     // после каждого теста откатываем миграции
     await knex.migrate.rollback();
