@@ -53,14 +53,14 @@ describe('test statuses CRUD', () => {
       const newStatusParams = testData.statuses.new;
       const response = await app.inject({
         method: 'POST',
-        url: app.reverse('create session'),
+        url: app.reverse('create status'),
         payload: {
           data: newStatusParams,
         },
         cookies,
       });
       const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
-      const newStatus = await models.statuses.query().findOne({ name: newStatusParams.name });
+      const newStatus = await models.status.query().findOne({ name: newStatusParams.name });
       expect(response.statusCode).toBe(302);
       expect(newCount).toBe(oldCount + 1);
       expect(newStatus).toMatchObject(newStatusParams);
