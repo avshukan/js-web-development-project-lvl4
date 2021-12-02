@@ -43,7 +43,7 @@ describe('test statuses CRUD', () => {
     const [sessionCookie] = authResponse.cookies;
     const { name, value } = sessionCookie;
     cookies = { [name]: value };
-    maxId = await models.user.query().max('id as max').first().then(({ max }) => max);
+    maxId = await models.status.query().max('id as max').first().then(({ max }) => max);
     oldCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
     standartParams = testData.statuses.standart;
     standartStatus = await models.status.query().findOne({ name: standartParams.name });
