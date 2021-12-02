@@ -9,6 +9,7 @@ describe('test statuses CRUD', () => {
   let app;
   let knex;
   let models;
+  let cookies;
   const testData = getTestData();
 
   beforeAll(async () => {
@@ -23,6 +24,21 @@ describe('test statuses CRUD', () => {
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
+    // авторизация
+    const authParams = testData.users.olddata;
+    const authResponse = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: authParams,
+      },
+    });
+    // после успешной аутентификации получаем куки из ответа,
+    // они понадобятся для выполнения запросов на маршруты требующие
+    // предварительную аутентификацию
+    const [sessionCookie] = authResponse.cookies;
+    const { name, value } = sessionCookie;
+    cookies = { [name]: value };
   });
 
   describe('test statuses create', () => {
@@ -32,23 +48,6 @@ describe('test statuses CRUD', () => {
     test.todo('fail: create new empty name');
 
     it('success: create new status', async () => {
-      // авторизация
-      const authParams = testData.users.olddata;
-      const authResponse = await app.inject({
-        method: 'POST',
-        url: app.reverse('session'),
-        payload: {
-          data: authParams,
-        },
-      });
-      expect(authResponse.statusCode).toBe(302);
-      // после успешной аутентификации получаем куки из ответа,
-      // они понадобятся для выполнения запросов на маршруты требующие
-      // предварительную аутентификацию
-      const [sessionCookie] = authResponse.cookies;
-      const { name, value } = sessionCookie;
-      const cookies = { [name]: value };
-
       const oldCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
       const newStatusParams = testData.statuses.new;
       const response = await app.inject({
@@ -59,11 +58,11 @@ describe('test statuses CRUD', () => {
         },
         cookies,
       });
-      const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
       const newStatus = await models.status.query().findOne({ name: newStatusParams.name });
+      const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
       expect(response.statusCode).toBe(302);
-      expect(newCount).toBe(oldCount + 1);
       expect(newStatus).toMatchObject(newStatusParams);
+      expect(newCount).toBe(oldCount + 1);
     });
   });
 
