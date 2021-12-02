@@ -1,4 +1,21 @@
 {
+  "statuses" : {
+    "standart": {
+      "name": "Standart"
+    },
+    "new": {
+      "name": "New status"
+    },
+    "empty": {
+      "name": ""
+    },
+    "exists": {
+      "name": "Done"
+    },
+    "not exists": {
+      "name": "X"
+    }
+  },
   "users": {
     "new": {
       "firstName": "malika",
