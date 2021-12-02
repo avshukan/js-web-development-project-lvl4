@@ -25,9 +25,9 @@ export default (app) => {
         console.log('error', error);
         req.flash('error', i18next.t('flash.statuses.create.error'));
         reply.statusCode = 422;
-        return reply.redirect(app.reverse('root'));
-        // reply.render('statuses/new', { status: data, errors: error.data });
-        // return reply;
+        // return reply.redirect(app.reverse('root'));
+        reply.render('statuses/new', { status: data, errors: error.data });
+        return reply;
       }
     })
     .patch('/statuses/:id', { name: 'update status' }, async (_req, reply) => reply.redirect(app.reverse('root')))
