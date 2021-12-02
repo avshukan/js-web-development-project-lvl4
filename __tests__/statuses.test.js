@@ -42,11 +42,6 @@ describe('test statuses CRUD', () => {
   });
 
   describe('test statuses create', () => {
-    // test.todo('success: create new status');
-    test.todo('fail: create new status without auth');
-    test.todo('fail: create new nonuniq name');
-    test.todo('fail: create new empty name');
-
     it('success: create new status', async () => {
       const oldCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
       const newStatusParams = testData.statuses.new;
@@ -63,6 +58,60 @@ describe('test statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
       expect(newStatus).toMatchObject(newStatusParams);
       expect(newCount).toBe(oldCount + 1);
+    });
+
+    it('fail: create new status without auth', async () => {
+      const oldCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      const newStatusParams = testData.statuses.new;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create status'),
+        payload: {
+          data: newStatusParams,
+        },
+        // cookies,
+      });
+      const newStatus = await models.status.query().findOne({ name: newStatusParams.name });
+      const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(newStatus).toBeUndefined();
+      expect(newCount).toBe(oldCount);
+    });
+
+    it('fail: create new nonuniq name', async () => {
+      const oldCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      const params = testData.statuses.exists;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create status'),
+        payload: {
+          data: params,
+        },
+        cookies,
+      });
+      const newStatus = await models.status.query().findOne({ name: params.name });
+      const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(422);
+      expect(newStatus).toMatchObject(params);
+      expect(newCount).toBe(oldCount);
+    });
+
+    it('fail: create new empty name', async () => {
+      const oldCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      const params = testData.statuses.empty;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create status'),
+        payload: {
+          data: params,
+        },
+        cookies,
+      });
+      const newStatus = await models.status.query().findOne({ name: params.name });
+      const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(422);
+      expect(newStatus).toBeUndefined();
+      expect(newCount).toBe(oldCount);
     });
   });
 
