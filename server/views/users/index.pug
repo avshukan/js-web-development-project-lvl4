@@ -9,6 +9,8 @@ block content
         th= t('views.users.lastName')
         th= t('views.users.email')
         th= t('views.users.createdAt')
+        th= t('views.users.update')
+        th= t('views.users.delete')
     tbody
       each user in users
         tr
@@ -20,4 +22,4 @@ block content
           td
             a(href=route('page to update user', {id: user.id}) class="btn nav-link")= t('views.users.update')
           td
-            +buttonTo(route('delete user', {id: '5'}), 'delete')(class="btn nav-link" value=t('views.users.delete'))
+            +buttonTo(route('delete user', { id: user.id }), 'delete')(class="btn nav-link" value=t('views.users.delete'))
