@@ -18,7 +18,7 @@ export default (app) => {
         return reply.redirect(app.reverse('root'));
       }
       const status = new app.objection.models.status();
-      return reply.render('users/new', { status });
+      return reply.render('statuses/new', { status });
     })
     .get('/statuses/:id', { name: 'page to update status' }, async (req, reply) => {
       if (!req.session.get('id')) {
@@ -26,8 +26,8 @@ export default (app) => {
         return reply.redirect(app.reverse('root'));
       }
       const id = +req.params?.id;
-      const user = await app.objection.models.user.query().findById(id);
-      return reply.render('users/edit', { user, errors: {} });
+      const status = await app.objection.models.status.query().findById(id);
+      return reply.render('statuses/edit', { status, errors: {} });
     })
     .post('/statuses', { name: 'create status' }, async (req, reply) => {
       if (!req.session.get('id')) {

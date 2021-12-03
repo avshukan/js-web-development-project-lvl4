@@ -1,0 +1,23 @@
+extends ../layouts/application.pug
+
+block content
+  div
+    a(href=route('page to create status') class="btn nav-link")= t('views.statuses.create')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.statuses.id')
+        th= t('views.statuses.name')
+        th= t('views.statuses.createdAt')
+        th= t('views.statuses.update')
+        th= t('views.statuses.delete')
+    tbody
+      each status in statuses
+        tr
+          td= status.id
+          td= status.name
+          td= formatDate(status.createdAt)
+          td
+            a(href=route('page to update status', {id: status.id}) class="btn nav-link")= t('views.statuses.update')
+          td
+            +buttonTo(route('delete status', { id: status.id }), 'delete')(class="btn nav-link" value=t('views.statuses.delete'))

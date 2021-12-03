@@ -71,6 +71,28 @@ module.exports = {
           },
         },
       },
+      statuses: {
+        id: 'ID',
+        name: 'Статус',
+        createdAt: 'Дата создания',
+        create: 'Добавить',
+        update: 'Редактировать',
+        delete: 'Удалить',
+        new: {
+          submit: 'Сохранить',
+          header: 'Создание статуса',
+          labels: {
+            name: 'Название',
+          },
+        },
+        edit: {
+          submit: 'Сохранить',
+          header: 'Редактирование статуса',
+          labels: {
+            name: 'Название',
+          },
+        },
+      },
       users: {
         id: 'ID',
         email: 'Email',
