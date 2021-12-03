@@ -24,7 +24,7 @@ export default (app) => {
       reply.render('statuses/new', { status });
       return reply;
     })
-    .get('/statuses/:id', { name: 'page to update status' }, async (req, reply) => {
+    .get('/statuses/:id/edit', { name: 'page to update status' }, async (req, reply) => {
       if (!req.session.get('id')) {
         req.flash('error', i18next.t('flash.authError'));
         reply.redirect(app.reverse('root'));
