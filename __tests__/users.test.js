@@ -25,32 +25,31 @@ describe('test users CRUD', () => {
     await prepareData(app);
   });
 
-  it('index', async () => {
+  it('page list success', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('users'),
+      url: app.reverse('page of users list'),
     });
     expect(response.statusCode).toBe(200);
   });
 
-  it('new', async () => {
+  it('page new success', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('newUser'),
+      url: app.reverse('page to create user'),
     });
     expect(response.statusCode).toBe(200);
   });
 
-  it('create', async () => {
+  it('create user success', async () => {
     const params = testData.users.new;
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('users'),
+      url: app.reverse('create user'),
       payload: {
         data: params,
       },
     });
-
     expect(response.statusCode).toBe(302);
     const expected = {
       ..._.omit(params, 'password'),
@@ -58,11 +57,13 @@ describe('test users CRUD', () => {
     };
     const user = await models.user.query().findOne({ email: params.email });
     expect(user).toMatchObject(expected);
+  });
 
+  it('create user fail', async () => {
     const existingParams = testData.users.existing;
     const existingResponse = await app.inject({
       method: 'POST',
-      url: app.reverse('users'),
+      url: app.reverse('create user'),
       payload: {
         data: existingParams,
       },
@@ -70,123 +71,231 @@ describe('test users CRUD', () => {
     expect(existingResponse.statusCode).toBe(422);
   });
 
-  it('edit', async () => {
-    console.log('nonexistent');
-    const nonexistentParams = testData.users.nonexistent;
-    const nonexistentResponse = await app.inject({
-      method: 'GET',
-      url: `/users/${nonexistentParams.id}`,
-      // url: app.reverse(`/users/${nonexistentParams.id}`),
-    });
-    expect(nonexistentResponse.statusCode).toBe(404);
-
-    console.log('authorizing');
+  it('edit user success', async () => {
+    const oldParams = testData.users.olddata;
+    const newParams = testData.users.newdata;
+    const oldUser = await models.user.query().findOne({ email: oldParams.email });
+    // авторизация
     const responseSignIn = await app.inject({
       method: 'POST',
       url: app.reverse('session'),
       payload: {
-        data: testData.users.olddata,
+        data: oldParams,
       },
     });
-    const cookies = responseSignIn.cookies;
-    const { value: id } = cookies.filter((item) => item.name === 'id')[0];
+    expect(responseSignIn.statusCode).toBe(302);
+    // после успешной аутентификации получаем куки из ответа,
+    // они понадобятся для выполнения запросов на маршруты требующие
+    // предварительную аутентификацию
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    const cookies = { [name]: value };
 
-    console.log('updating');
+    // открывается страница для редактирования пользователя
     const olddataResponse = await app.inject({
       method: 'GET',
-      // url: app.reverse(`users/${id}/edit`),
-      url: `users/${id}/edit`,
+      url: app.reverse('page to update user', { id: oldUser.id }),
+      // используем полученные ранее куки
+      cookies,
     });
     expect(olddataResponse.statusCode).toBe(200);
 
-    console.log('unauthorized');
-    // добавить обновление данных
-    // PATCH /users/:id - обновление пользователя
-    // 302 - успешное обновление с переадресацией (куда?)
-    // 401 - ошибка обновления, потому что id не соответствует id пользователя
-    // 422 - ошибка обновления по другим причинам
-    const unauthorizedId = 1;
-    const newParams = testData.users.newdata;
-    const unauthorizedResponse = await app.inject({
+    const newdataResponse = await app.inject({
       method: 'PATCH',
-      // url: app.reverse(`users/${unauthorizedId}/edit`),
-      url: `users/${unauthorizedId}/edit`,
+      url: app.reverse('update user', { id: oldUser.id }),
       payload: {
         data: newParams,
       },
+      // используем полученные ранее куки
+      cookies,
     });
-    // const unauthorizedUser = await models.user.query().findOne({ id: unauthorizedId });
-    expect(unauthorizedResponse.statusCode).toBe(401);
-    // expect(user).toBeNull();
+    const newUser = await models.user.query().findOne({ id: oldUser.id });
+    const expectedNewUser = {
+      ..._.omit(newParams, 'password'),
+      passwordDigest: encrypt(newParams.password),
+    };
+    expect(newdataResponse.statusCode).toBe(302);
+    expect(newUser).toMatchObject(expectedNewUser);
+  });
 
+  it('edit user fail', async () => {
+    const existingParams = testData.users.existing;
+    const exisitngUser = await models.user.query().findOne({ email: existingParams.email });
+    const exisitngUsers = await models.user.query();
+    const standartData = _.pick(exisitngUser, ['id', 'firstName', 'lastName', 'email', 'newPasswordDigest']);
+    const standartUsersCount = exisitngUsers.length;
+
+    // send data with no cookies (and no authorizing)
+    const newParams = testData.users.newdata;
+    const unauthorizedResponse = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('update user', { id: exisitngUser.id }),
+      payload: {
+        data: newParams,
+      },
+      // используем полученные ранее куки
+      // cookies,
+    });
+    const unauthorizedUser = await models.user.query().findOne({ id: standartData.id });
+    const unauthorizedUsers = await models.user.query();
+    const unauthorizedData = _.pick(unauthorizedUser, ['id', 'firstName', 'lastName', 'email', 'newPasswordDigest']);
+    expect(unauthorizedResponse.statusCode).toBe(302);
+    expect(unauthorizedData).toMatchObject(standartData);
+    expect(unauthorizedUsers.length).toBe(standartUsersCount);
+
+    // sign in (auxiliary)
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: existingParams,
+      },
+    });
+    expect(responseSignIn.statusCode).toBe(302);
+    // после успешной аутентификации получаем куки из ответа,
+    // они понадобятся для выполнения запросов на маршруты требующие
+    // предварительную аутентификацию
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    const cookies = { [name]: value };
+
+    // send data to notexistent id
+    const max = await models.user.query().max('id as value').first();
+    const nonexistentResponse = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('update user', { id: (max.value + 1) }),
+      payload: {
+        data: newParams,
+      },
+      // используем полученные ранее куки
+      cookies,
+    });
+    expect(nonexistentResponse.statusCode).toBe(302);
+    const nonexistentUsers = await models.user.query();
+    expect(nonexistentUsers.length).toBe(standartUsersCount);
+
+    // send empty data
     const badParams = {};
     const badResponse = await app.inject({
       method: 'PATCH',
-      // url: app.reverse(`users/${id}/edit`),
-      url: `users/${id}/edit`,
+      url: app.reverse('update user', { id: standartData.id }),
       payload: {
         data: badParams,
       },
+      cookies,
     });
-    const user = await models.user.query().findOne({ id });
+    const badUser = await models.user.query().findOne({ id: standartData.id });
+    const badUsers = await models.user.query();
+    const badData = _.pick(badUser, ['id', 'firstName', 'lastName', 'email', 'newPasswordDigest']);
     expect(badResponse.statusCode).toBe(422);
-    expect(user).toBeNull();
+    expect(badData).toMatchObject(standartData);
+    expect(badUsers.length).toBe(standartUsersCount);
 
-    const newResponse = await app.inject({
+    // send duplicated email
+    const duplicateParams = testData.users.duplicateemaildata;
+    const duplicateResponse = await app.inject({
       method: 'PATCH',
-      // url: app.reverse(`users/${id}/edit`),
-      url: `users/${id}/edit`,
+      url: app.reverse('update user', { id: standartData.id }),
       payload: {
-        data: newParams.email,
+        data: duplicateParams,
       },
+      cookies,
     });
-    const newUser = await models.user.query().findOne({ id });
-    const newEmail = newUser.email;
-    const newPasswordDigest = newUser.passwordDigest;
-    expect(newResponse.statusCode).toBe(302);
-    expect(newEmail).toBe(newParams);
-    expect(newPasswordDigest).toBe(encrypt(newParams.password));
+    const duplicateUser = await models.user.query().findOne({ id: standartData.id });
+    const duplicateUsers = await models.user.query();
+    const duplicateData = _.pick(duplicateUser, ['id', 'firstName', 'lastName', 'email', 'newPasswordDigest']);
+    expect(duplicateResponse.statusCode).toBe(422);
+    expect(duplicateData).toMatchObject(standartData);
+    expect(duplicateUsers.length).toBe(standartUsersCount);
   });
 
-  it('delete', async () => {
-    const users = await models.user.query();
-    const deletedUser = users[0];
+  it('delete user success', async () => {
+    const existingParams = testData.users.existing;
+    const exisitngUser = await models.user.query().findOne({ email: existingParams.email });
+    const exisitngUsers = await models.user.query();
+    const standartUsersCount = exisitngUsers.length;
 
-    console.log('UNAUTHORIZED DELETED');
-    const params = { id: 1, password: 'O6AvLIQL1cbzrre' };
-    const response = await app.inject({
-      method: 'DELETE',
-      // url: app.reverse('users'),
-      url: `users/${deletedUser.id}`,
-    });
-    const user = await models.user.query().findById(params.id);
-    expect(response.statusCode).toBe(404);
-    expect(user).toBeNull();
-
-    const wrongParams = { id: 1, password: 'wrongPassword' };
-    const expectedWronguser = await models.user.query().findOne({ id: params.id });
-    const wrongResponse = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('users'),
+    // signing in (auxiliary)
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
       payload: {
-        data: wrongParams,
+        data: existingParams,
       },
     });
-    const wrongUser = await models.user.query().findOne({ id: params.id });
-    expect(wrongResponse.statusCode).toBe(401);
-    expect(wrongUser).toMatchObject(expectedWronguser);
+    expect(responseSignIn.statusCode).toBe(302);
+    // после успешной аутентификации получаем куки из ответа,
+    // они понадобятся для выполнения запросов на маршруты требующие
+    // предварительную аутентификацию
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    const cookies = { [name]: value };
 
-    const badParams = { id: 999, password: '123' };
-    const badResponse = await app.inject({
+    // deleting existing user
+    const deleteResponse = await app.inject({
       method: 'DELETE',
-      url: app.reverse('users'),
+      url: app.reverse('delete user', { id: exisitngUser.id }),
+      // используем полученные ранее куки
+      cookies,
+    });
+    const deleteUser = await models.user.query().findOne({ id: exisitngUser.id });
+    const deleteUsers = await models.user.query();
+    expect(deleteResponse.statusCode).toBe(302);
+    expect(deleteUser).toBeUndefined();
+    expect(deleteUsers.length).toBe(standartUsersCount - 1);
+  });
+
+  it('delete user fail', async () => {
+    const existingParams = testData.users.existing;
+    const exisitngUser = await models.user.query().findOne({ email: existingParams.email });
+    const exisitngUsers = await models.user.query();
+    const standartData = _.pick(exisitngUser, ['id', 'firstName', 'lastName', 'email', 'newPasswordDigest']);
+    const standartUsersCount = exisitngUsers.length;
+
+    // signing in (auxiliary)
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
       payload: {
-        data: badParams,
+        data: existingParams,
       },
     });
-    const badUser = await models.user.query().findOne({ id: params.id });
-    expect(badResponse.statusCode).toBe(422);
-    expect(badUser).toBeNull();
+    expect(responseSignIn.statusCode).toBe(302);
+    // после успешной аутентификации получаем куки из ответа,
+    // они понадобятся для выполнения запросов на маршруты требующие
+    // предварительную аутентификацию
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    const cookies = { [name]: value };
+
+    // send data with no cookies (and no authorizing)
+    const unauthorizedResponse = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('delete user', { id: exisitngUser.id }),
+      // используем полученные ранее куки
+      // cookies,
+    });
+    const unauthorizedUser = await models.user.query().findOne({ id: exisitngUser.id });
+    const unauthorizedUsers = await models.user.query();
+    const unauthorizedData = _.pick(unauthorizedUser, ['id', 'firstName', 'lastName', 'email', 'newPasswordDigest']);
+    expect(unauthorizedResponse.statusCode).toBe(302);
+    expect(unauthorizedData).toMatchObject(standartData);
+    expect(unauthorizedUsers.length).toBe(standartUsersCount);
+
+    // send data to notexistent id
+    const max = await models.user.query().max('id as value').first();
+    const nonexistentResponse = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('delete user', { id: (max.value + 1) }),
+      // используем полученные ранее куки
+      cookies,
+    });
+    const nonexistentUser = await models.user.query().findOne({ id: exisitngUser.id });
+    const nonexistentData = _.pick(nonexistentUser, ['id', 'firstName', 'lastName', 'email', 'newPasswordDigest']);
+    const nonexistentUsers = await models.user.query();
+    expect(nonexistentResponse.statusCode).toBe(302);
+    expect(nonexistentData).toMatchObject(standartData);
+    expect(nonexistentUsers.length).toBe(standartUsersCount);
   });
 
   afterEach(async () => {

@@ -16,18 +16,35 @@ module.exports = {
       users: {
         create: {
           error: 'Не удалось зарегистрировать',
-          unauthorized: 'Не достаточно прав для выполнения операции',
+          unauthorized: 'Не достаточно прав для создания пользователя',
           success: 'Пользователь успешно зарегистрирован',
         },
         update: {
           error: 'Не удалось обновить',
-          unauthorized: 'Не достаточно прав для выполнения операции',
+          unauthorized: 'Не достаточно прав для редактирования пользователя',
           success: 'Пользователь успешно обновлён',
         },
         delete: {
           error: 'Не удалось удалить',
-          unauthorized: 'Не достаточно прав для выполнения операции',
+          unauthorized: 'Не достаточно прав для удаления пользователя',
           success: 'Пользователь успешно удалён',
+        },
+      },
+      statuses: {
+        create: {
+          error: 'Не удалось создать статус',
+          unauthorized: 'Не достаточно прав для создания статуса',
+          success: 'Статус успешно создан',
+        },
+        update: {
+          error: 'Не удалось обновить статус',
+          unauthorized: 'Не достаточно прав для редактирования статуса',
+          success: 'Статус успешно обновлён',
+        },
+        delete: {
+          error: 'Не удалось удалить статус',
+          unauthorized: 'Не достаточно прав для удаления статуса',
+          success: 'Статус успешно удалён',
         },
       },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
@@ -35,6 +52,7 @@ module.exports = {
     layouts: {
       application: {
         users: 'Пользователи',
+        statuses: 'Статусы',
         account: 'Аккаунт',
         signIn: 'Вход',
         signUp: 'Регистрация',
@@ -50,7 +68,29 @@ module.exports = {
           labels: {
             email: 'Email',
             password: 'Пароль',
-          }
+          },
+        },
+      },
+      statuses: {
+        id: 'ID',
+        name: 'Статус',
+        createdAt: 'Дата создания',
+        create: 'Добавить',
+        update: 'Редактировать',
+        delete: 'Удалить',
+        new: {
+          submit: 'Сохранить',
+          header: 'Создание статуса',
+          labels: {
+            name: 'Название',
+          },
+        },
+        edit: {
+          submit: 'Сохранить',
+          header: 'Редактирование статуса',
+          labels: {
+            name: 'Название',
+          },
         },
       },
       users: {
@@ -67,7 +107,7 @@ module.exports = {
             lastName: 'Фамилия',
             email: 'Email',
             password: 'Пароль',
-          }
+          },
         },
         edit: {
           submit: 'Сохранить',
@@ -77,7 +117,7 @@ module.exports = {
             lastName: 'Фамилия',
             email: 'Email',
             password: 'Пароль',
-          }
+          },
         },
       },
       welcome: {

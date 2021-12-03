@@ -20,13 +20,9 @@ export default (app) => {
         reply.statusCode = 422;
         return reply.render('session/new', { signInForm, errors });
       }
-      console.log('user before', user);
-      const result = await req.logIn(user);
-      console.log('result', result);
-      console.log('user after', user);
+      await req.logIn(user);
       req.flash('success', i18next.t('flash.session.create.success'));
-      reply.setCookie('user', JSON.stringify(user));
-      reply.setCookie('id', user.id);
+      req.session.set('id', user.id);
       return reply.redirect(app.reverse('root'));
     }))
     .delete('/session', (req, reply) => {
