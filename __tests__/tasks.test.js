@@ -63,6 +63,7 @@ describe('test statuses CRUD', () => {
       expect(newTask).toMatchObject(newTaskParams);
       expect(countAfter).toBe(countBefore + 1);
     });
+
     it('fail: create new task without auth', async () => {
       const newTaskParams = testData.tasks.new;
       const response = await app.inject({
@@ -79,6 +80,7 @@ describe('test statuses CRUD', () => {
       expect(newTask).toBeUndefined();
       expect(countAfter).toBe(countBefore);
     });
+
     it('fail: create new task with empty name', async () => {
       const emptyTaskParams = testData.tasks.empty;
       const response = await app.inject({
@@ -95,6 +97,7 @@ describe('test statuses CRUD', () => {
       expect(newTask).toBeUndefined();
       expect(countAfter).toBe(countBefore);
     });
+
     it('fail: create new task with unreal statusId', async () => {
       const unrealTaskParams = testData.tasks.unrealStatus;
       const response = await app.inject({
@@ -114,16 +117,115 @@ describe('test statuses CRUD', () => {
   });
 
   describe('test tasks read', () => {
-    test.todo('success: get page of tasks list');
-    test.todo('fail: get page of tasks list without auth');
-    test.todo('success: get page to create task');
-    test.todo('fail: get page to create task without auth');
-    test.todo('success: get page to show task');
-    test.todo('fail: get page to show task without auth');
-    test.todo('fail: get page to show task with unreal taskId');
-    test.todo('success: get page to update task');
-    test.todo('fail: get page to update task without auth');
-    test.todo('fail: get page to update task with unreal taskId');
+    it('success: get page of tasks list', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of tasks list'),
+        cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(200);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page of tasks list without auth', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of tasks list'),
+        // cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('success: get page to create task', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page to create task'),
+        cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(200);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page to create task without auth', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page to create task'),
+        // cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('success: get page to show task', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page to show task', { id: standartTask.id }),
+        cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(200);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page to show task without auth', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page to show task', { id: standartTask.id }),
+        // cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page to show task with unreal taskId', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page to show task', { id: unrealTaskId }),
+        cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('success: get page to update task', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page to update task', { id: standartTask.id }),
+        cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(200);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page to update task without auth', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page to update task', { id: standartTask.id }),
+        // cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page to update task with unreal taskId', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page to update task', { id: unrealTaskId }),
+        cookies,
+      });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
   });
 
   describe('test statuses update', () => {
