@@ -114,6 +114,7 @@ module.exports = {
         },
         new: {
           header: 'Создание статуса',
+          submit: 'Создать',
         },
         edit: {
           header: 'Редактирование статуса',

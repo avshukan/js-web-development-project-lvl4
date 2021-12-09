@@ -14,8 +14,14 @@ export default (app) => {
       reply.render('tasks/list', { tasks });
       return reply;
     })
-    .get('/tasks/new', { name: 'page to create task' }, async (_req, reply) => {
-      reply.redirect(app.reverse('root'));
+    .get('/tasks/new', { name: 'page to create task' }, async (req, reply) => {
+      if (!req.session.get('id')) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect(app.reverse('root'));
+        return reply;
+      }
+      const task = new app.objection.models.task();
+      reply.render('tasks/new', { task });
       return reply;
     })
     .get('/tasks/:id', { name: 'page to show task' }, async (_req, reply) => {
