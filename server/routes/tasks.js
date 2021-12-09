@@ -4,8 +4,14 @@ import i18next from 'i18next';
 
 export default (app) => {
   app
-    .get('/tasks', { name: 'page of tasks list' }, async (_req, reply) => {
-      reply.redirect(app.reverse('root'));
+    .get('/tasks', { name: 'page of tasks list' }, async (req, reply) => {
+      if (!req.session.get('id')) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect(app.reverse('root'));
+        return reply;
+      }
+      const tasks = await app.objection.models.task.query();
+      reply.render('tasks/list', { tasks });
       return reply;
     })
     .get('/tasks/new', { name: 'page to create task' }, async (_req, reply) => {

@@ -94,6 +94,31 @@ module.exports = {
           },
         },
       },
+      tasks: {
+        labels: {
+          id: 'ID',
+          name: 'Наименование',
+          description: 'Описание',
+          statusId: 'Статус',
+          creatorId: 'Автор',
+          executorId: 'Исполнитель',
+          createdAt: 'Дата создания',
+        },
+        controls: {
+          create: 'Добавить',
+          update: 'Редактировать',
+          delete: 'Удалить',
+        },
+        list: {
+          header: 'Список задач',
+        },
+        new: {
+          header: 'Создание статуса',
+        },
+        edit: {
+          header: 'Редактирование статуса',
+        },
+      },
       users: {
         id: 'ID',
         firstName: 'Имя',
