@@ -1,0 +1,13 @@
+extends ../layouts/application.pug
+
+block header
+  = t('views.tasks.new.signUp')
+
+block content
+  +formFor()(action=route('create task') method='post')
+    +input(task, 'name', t('views.tasks.new.labels.name'), errors)(type="text")
+    +input(task, 'description', t('views.tasks.new.labels.description'), errors)(type="text")
+    +input(task, 'statusId', t('views.tasks.new.labels.statusId'statusId errors)(type="text")
+    +input(task, 'creatorId', t('views.tasks.new.labels.creatorId'statusId errors)(type="text")
+    +input(task, 'executorId', t('views.tasks.new.labels.executorId'statusId errors)(type="text")
+    +submit(task)(value=t('views.tasks.new.submit'))

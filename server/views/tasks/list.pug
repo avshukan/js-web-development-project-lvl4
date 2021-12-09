@@ -1,0 +1,31 @@
+extends ../layouts/application.pug
+
+block content
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.tasks.id')
+        th= t('views.tasks.name')
+        th= t('views.tasks.description')
+        th= t('views.tasks.statusId')
+        th= t('views.tasks.creatorId')
+        th= t('views.tasks.executorId')
+        th= t('views.tasks.createdAt')
+        th= t('views.tasks.update')
+        th= t('views.tasks.delete')
+    tbody
+      each task in tasks
+        tr
+          td= task.id
+          td
+            a(href=route('page to show task', {id: task.id}) class="btn nav-link")= t('views.tasks.update')
+          td= task.name
+          td= task.description
+          td= task.statusId
+          td= task.creatorId
+          td= task.executorId
+          td= formatDate(task.createdAt)
+          td
+            a(href=route('page to update task', {id: task.id}) class="btn nav-link")= t('views.tasks.update')
+          td
+            +buttonTo(route('delete task', { id: task.id }), 'delete')(class="btn nav-link" value=t('views.tasks.delete'))
