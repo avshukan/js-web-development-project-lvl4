@@ -288,7 +288,7 @@ describe('test statuses CRUD', () => {
         payload: {
           data: newTaskParams,
         },
-        // cookies,
+        cookies,
       });
       const taskAfter = await models.task.query().findOne({ id: unrealTaskId });
       const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
@@ -299,10 +299,59 @@ describe('test statuses CRUD', () => {
   });
 
   describe('test task delete', () => {
-    test.todo('success: delete task');
-    test.todo('fail: delete status without auth');
-    test.todo('fail: delete status by no creator');
-    test.todo('fail: delete status with unreal taskId');
+    it('success: delete task', async () => {
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete status', { id: standartTask.id }),
+        cookies,
+      });
+      const taskAfter = await models.task.query().findOne({ id: standartTask.id });
+      const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(taskAfter).toBeUndefined();
+      expect(countAfter).toBe(countBefore - 1);
+    });
+
+    it('fail: delete task without auth', async () => {
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete status', { id: standartTask.id }),
+        // cookies,
+      });
+      const taskAfter = await models.task.query().findOne({ id: standartTask.id });
+      const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(taskAfter).toMatchObject(standartTask);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: delete task with unreal task id', async () => {
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete status', { id: unrealTaskId }),
+        cookies,
+      });
+      const taskAfter = await models.task.query().findOne({ id: unrealTaskId });
+      const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(taskAfter).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: delete task by no creator', async () => {
+      const authUser = await models.user.query().findOne({ email: testData.users.olddata.email });
+      const otherTask = await models.task.query().whereNot('creatorId', authUser.id).first();
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete status', { id: otherTask.id }),
+        cookies,
+      });
+      const taskAfter = await models.task.query().findOne({ id: otherTask.id });
+      const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(taskAfter).toMatchObject(otherTask);
+      expect(countAfter).toBe(countBefore);
+    });
   });
 
   afterEach(async () => {
