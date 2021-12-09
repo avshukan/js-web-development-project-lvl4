@@ -7,10 +7,10 @@ describe('test statuses CRUD', () => {
   let knex;
   let models;
   let cookies;
-  let unrealId;
-  let oldTaskCount;
+  let unrealTaskId;
+  let countBefore;
   let standartParams;
-  let standartStatus;
+  let standartTask;
   const testData = getTestData();
 
   beforeAll(async () => {
@@ -40,17 +40,77 @@ describe('test statuses CRUD', () => {
     const [sessionCookie] = authResponse.cookies;
     const { name, value } = sessionCookie;
     cookies = { [name]: value };
-    unrealId = await models.task.query().max('id as max').first().then(({ max }) => max) + 1;
-    oldTaskCount = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
-    standartParams = testData.statuses.standart;
-    standartStatus = await models.task.query().findOne({ name: standartParams.name });
+    unrealTaskId = await models.task.query().max('id as max').first().then(({ max }) => max) + 1;
+    countBefore = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+    standartParams = testData.tasks.standart;
+    standartTask = await models.task.query().findOne({ name: standartParams.name });
   });
 
   describe('test tasks create', () => {
-    test.todo('success: create new task');
-    test.todo('fail: create new task without auth');
-    test.todo('fail: create new task with empty name');
-    test.todo('fail: create new task with unreal statusId');
+    it('success: create new task', async () => {
+      const newTaskParams = testData.tasks.new;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create task'),
+        payload: {
+          data: newTaskParams,
+        },
+        cookies,
+      });
+      const newTask = await models.task.query().findOne({ name: newTaskParams.name });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(newTask).toMatchObject(newTaskParams);
+      expect(countAfter).toBe(countBefore + 1);
+    });
+    it('fail: create new task without auth', async () => {
+      const newTaskParams = testData.tasks.new;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create task'),
+        payload: {
+          data: newTaskParams,
+        },
+        // cookies,
+      });
+      const newTask = await models.task.query().findOne({ name: newTaskParams.name });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(newTask).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
+    it('fail: create new task with empty name', async () => {
+      const emptyTaskParams = testData.tasks.empty;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create task'),
+        payload: {
+          data: emptyTaskParams,
+        },
+        cookies,
+      });
+      const newTask = await models.task.query().findOne({ name: emptyTaskParams.name });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(422);
+      expect(newTask).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
+    it('fail: create new task with unreal statusId', async () => {
+      const unrealTaskParams = testData.tasks.unrealStatus;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create task'),
+        payload: {
+          data: unrealTaskParams,
+        },
+        cookies,
+      });
+      const newTask = await models.task.query().findOne({ name: unrealTaskParams.name });
+      const countAfter = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(422);
+      expect(newTask).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
   });
 
   describe('test tasks read', () => {

@@ -12,9 +12,14 @@
     },
     "empty": {
       "name": "",
-        "description": "Standart Task Description",
-        "statusId": 1
-      }
+      "description": "Empty Task Description",
+      "statusId": 1
+    },
+    "unrealStatus": {
+      "name": "Task with unreal Status Id",
+      "description": "Description for Task with unreal Status Id",
+      "statusId": 999
+    }
   },
   "statuses" : {
     "standart": {
