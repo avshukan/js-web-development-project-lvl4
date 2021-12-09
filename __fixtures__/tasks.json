@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Standart Task",
+    "description": "Standart Task Description",
+    "statusId": 1,
+    "creatorId": 1,
+    "executorId": 1
+  },
+  {
+    "name": "Second Task",
+    "description": "Second Task Description",
+    "statusId": 1,
+    "creatorId": 1,
+    "executorId": 1
+  },
+  {
+    "name": "Task of Other User",
+    "description": "Some text",
+    "statusId": 1,
+    "creatorId": 2,
+    "executorId": 1
+  },
+  {
+    "name": "Last Task",
+    "description": "",
+    "statusId": 2,
+    "creatorId": 2,
+    "executorId": 2
+  }
+]
