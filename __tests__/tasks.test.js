@@ -46,7 +46,7 @@ describe('test statuses CRUD', () => {
     standartTask = await models.task.query().findOne({ name: standartParams.name });
   });
 
-  describe('test tasks create', () => {
+  describe('test task create', () => {
     it('success: create new task', async () => {
       const newTaskParams = testData.tasks.new;
       const response = await app.inject({
@@ -116,7 +116,7 @@ describe('test statuses CRUD', () => {
     });
   });
 
-  describe('test tasks read', () => {
+  describe('test task read', () => {
     it('success: get page of tasks list', async () => {
       const response = await app.inject({
         method: 'GET',
@@ -228,14 +228,77 @@ describe('test statuses CRUD', () => {
     });
   });
 
-  describe('test statuses update', () => {
-    test.todo('success: update task');
-    test.todo('fail: update task without auth');
-    test.todo('fail: update task with empty name');
-    test.todo('fail: update task with unreal taskId');
+  describe('test task update', () => {
+    it('success: update task', async () => {
+      const newTaskParams = testData.tasks.new;
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update task', { id: standartTask.id }),
+        payload: {
+          data: newTaskParams,
+        },
+        cookies,
+      });
+      const taskAfter = await models.task.query().findOne({ id: standartTask.id });
+      const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(taskAfter).toMatchObject(newTaskParams);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: update task without auth', async () => {
+      const newTaskParams = testData.tasks.new;
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update task', { id: standartTask.id }),
+        payload: {
+          data: newTaskParams,
+        },
+        // cookies,
+      });
+      const taskAfter = await models.task.query().findOne({ id: standartTask.id });
+      const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(taskAfter).toMatchObject(standartTask);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: update task with empty name', async () => {
+      const emptyTaskParams = testData.tasks.empty;
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update task', { id: standartTask.id }),
+        payload: {
+          data: emptyTaskParams,
+        },
+        cookies,
+      });
+      const taskAfter = await models.task.query().findOne({ id: standartTask.id });
+      const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(422);
+      expect(taskAfter).toMatchObject(standartParams);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: update task with unreal task id', async () => {
+      const newTaskParams = testData.tasks.new;
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update task', { id: unrealTaskId }),
+        payload: {
+          data: newTaskParams,
+        },
+        // cookies,
+      });
+      const taskAfter = await models.task.query().findOne({ id: unrealTaskId });
+      const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(422);
+      expect(taskAfter).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
   });
 
-  describe('test statuses delete', () => {
+  describe('test task delete', () => {
     test.todo('success: delete task');
     test.todo('fail: delete status without auth');
     test.todo('fail: delete status by no creator');
