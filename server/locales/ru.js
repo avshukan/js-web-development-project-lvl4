@@ -52,6 +52,7 @@ module.exports = {
     layouts: {
       application: {
         users: 'Пользователи',
+        tasks: 'Задачи',
         statuses: 'Статусы',
         account: 'Аккаунт',
         signIn: 'Вход',
