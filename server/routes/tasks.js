@@ -10,7 +10,7 @@ export default (app) => {
         reply.redirect(app.reverse('root'));
         return reply;
       }
-      const tasks = await app.objection.models.task.query();
+      const tasks = await app.objection.models.task.query().orderBy('updatedAt', 'desc');
       reply.render('tasks/list', { tasks });
       return reply;
     })
