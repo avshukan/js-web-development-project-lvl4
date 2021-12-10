@@ -48,6 +48,9 @@ module.exports = {
         },
       },
       tasks: {
+        show: {
+          error: 'Не удалось загрузить задачу',
+        },
         edit: {
           error: 'Не удалось загрузить задачу',
         },
@@ -129,12 +132,16 @@ module.exports = {
         list: {
           header: 'Список задач',
         },
+        show: {
+          header: 'Карточка задачи',
+        },
         new: {
           header: 'Создание задачи',
           submit: 'Создать',
         },
         edit: {
           header: 'Редактирование задачи',
+          submit: 'Сохранить',
         },
       },
       users: {
