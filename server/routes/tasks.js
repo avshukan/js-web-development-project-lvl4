@@ -111,7 +111,10 @@ export default (app) => {
           throw new Error();
         }
         const jsonTask = {
-          ...data, creatorId, statusId: +data.statusId, executorId: +data.executorId,
+          ...data,
+          statusId: +data.statusId,
+          creatorId: task.creatorId,
+          executorId: +data.executorId,
         };
         await task.$query().update(jsonTask);
         req.flash('success', i18next.t('flash.tasks.update.success'));
@@ -151,7 +154,6 @@ export default (app) => {
       } catch (error) {
         console.log('error', error);
         req.flash('error', i18next.t('flash.tasks.delete.error'));
-        reply.statusCode = 422;
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       }
