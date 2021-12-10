@@ -302,7 +302,7 @@ describe('test statuses CRUD', () => {
     it('success: delete task', async () => {
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('delete status', { id: standartTask.id }),
+        url: app.reverse('delete task', { id: standartTask.id }),
         cookies,
       });
       const taskAfter = await models.task.query().findOne({ id: standartTask.id });
@@ -315,7 +315,7 @@ describe('test statuses CRUD', () => {
     it('fail: delete task without auth', async () => {
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('delete status', { id: standartTask.id }),
+        url: app.reverse('delete task', { id: standartTask.id }),
         // cookies,
       });
       const taskAfter = await models.task.query().findOne({ id: standartTask.id });
@@ -328,7 +328,7 @@ describe('test statuses CRUD', () => {
     it('fail: delete task with unreal task id', async () => {
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('delete status', { id: unrealTaskId }),
+        url: app.reverse('delete task', { id: unrealTaskId }),
         cookies,
       });
       const taskAfter = await models.task.query().findOne({ id: unrealTaskId });
@@ -343,12 +343,12 @@ describe('test statuses CRUD', () => {
       const otherTask = await models.task.query().whereNot('creatorId', authUser.id).first();
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('delete status', { id: otherTask.id }),
+        url: app.reverse('delete task', { id: otherTask.id }),
         cookies,
       });
       const taskAfter = await models.task.query().findOne({ id: otherTask.id });
       const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
-      expect(response.statusCode).toBe(302);
+      expect(response.statusCode).toBe(422);
       expect(taskAfter).toMatchObject(otherTask);
       expect(countAfter).toBe(countBefore);
     });

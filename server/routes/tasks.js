@@ -1,5 +1,4 @@
 // @ts-check
-
 import i18next from 'i18next';
 
 export default (app) => {
@@ -127,8 +126,34 @@ export default (app) => {
       }
     })
 
-    .delete('/tasks/:id', { name: 'delete task' }, async (_req, reply) => {
-      reply.redirect(app.reverse('root'));
-      return reply;
+    .delete('/tasks/:id', { name: 'delete task' }, async (req, reply) => {
+      const creatorId = req.session.get('id');
+      if (!creatorId) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect(app.reverse('root'));
+        return reply;
+      }
+      const taskId = +req.params?.id;
+      const task = await app.objection.models.task.query().findById(taskId);
+      if (!task) {
+        req.flash('error', i18next.t('flash.tasks.delete.error'));
+        reply.redirect(app.reverse('page of tasks list'));
+        return reply;
+      }
+      try {
+        if (task.creatorId !== creatorId) {
+          throw new Error();
+        }
+        await app.objection.models.task.query().deleteById(taskId);
+        req.flash('success', i18next.t('flash.tasks.delete.success'));
+        reply.redirect(app.reverse('page of tasks list'));
+        return reply;
+      } catch (error) {
+        console.log('error', error);
+        req.flash('error', i18next.t('flash.tasks.delete.error'));
+        reply.statusCode = 422;
+        reply.redirect(app.reverse('page of tasks list'));
+        return reply;
+      }
     });
 };
