@@ -87,6 +87,7 @@ export default (app) => {
         return reply;
       } catch (error) {
         req.flash('error', i18next.t('flash.users.delete.error'));
+        reply.statusCode = 422;
         reply.redirect(app.reverse('page of users list'));
         return reply;
       }
