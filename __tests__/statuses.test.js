@@ -286,15 +286,19 @@ describe('test statuses CRUD', () => {
 
   describe('test statuses delete', () => {
     it('success: delete status', async () => {
+      // ищем статус, с которым НЕ связаны задачи.
+      const statusBefore = await knex('statuses').whereNotExists(knex.select('*').from('tasks').whereRaw('statuses.id = tasks.status_id')).first();
+      // убеждаемся, что в тестовых данных есть такой статус
+      expect(statusBefore).toBeDefined();
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('delete status', { id: standartStatus.id }),
+        url: app.reverse('delete status', { id: statusBefore.id }),
         cookies,
       });
-      const newStatus = await models.status.query().findOne({ id: standartStatus.id });
+      const statusAfter = await models.status.query().findOne({ id: statusBefore.id });
       const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
       expect(response.statusCode).toBe(302);
-      expect(newStatus).toBeUndefined();
+      expect(statusAfter).toBeUndefined();
       expect(newCount).toBe(oldCount - 1);
     });
 
@@ -315,10 +319,28 @@ describe('test statuses CRUD', () => {
       const response = await app.inject({
         method: 'DELETE',
         url: app.reverse('delete status', { id: maxId + 1 }),
-        // cookies,
+        cookies,
       });
       const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
       expect(response.statusCode).toBe(302);
+      expect(newCount).toBe(oldCount);
+    });
+
+    it('fail: delete status with task', async () => {
+      // ищем статус, с которым связаны задачи.
+      const statusBefore = await knex('statuses').whereExists(knex.select('*').from('tasks').whereRaw('statuses.id = tasks.status_id')).first();
+      // убеждаемся, что в тестовых данных есть такой статус
+      expect(statusBefore).toBeDefined();
+      console.log('statusBefore', statusBefore);
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete status', { id: statusBefore.id }),
+        cookies,
+      });
+      const statusAfter = await models.status.query().findOne({ id: statusBefore.id });
+      const newCount = await models.status.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(422);
+      expect(statusAfter).toMatchObject(statusBefore);
       expect(newCount).toBe(oldCount);
     });
   });
