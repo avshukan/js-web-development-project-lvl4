@@ -3,22 +3,26 @@
     "standart": {
       "name": "Standart Task",
       "description": "Standart Task Description",
-      "statusId": 1
+      "statusId": 1,
+      "executorId": 0
     },
     "new": {
       "name": "New Task",
       "description": "New Task Description",
-      "statusId": 1
+      "statusId": 1,
+      "executorId": 4
     },
     "empty": {
       "name": "",
       "description": "Empty Task Description",
-      "statusId": 1
+      "statusId": 1,
+      "executorId": 1
     },
     "unrealStatus": {
       "name": "Task with unreal Status Id",
       "description": "Description for Task with unreal Status Id",
-      "statusId": 999
+      "statusId": 999,
+      "executorId": 1
     }
   },
   "statuses" : {

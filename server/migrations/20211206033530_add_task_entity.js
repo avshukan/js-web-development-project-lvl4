@@ -4,9 +4,9 @@ exports.up = (knex) => knex.schema.createTable('tasks', (table) => {
   table.timestamp('updated_at').defaultTo(knex.fn.now());
   table.string('name');
   table.string('description');
-  table.integer('statusId');
-  table.integer('creatorId');
-  table.integer('executorId');
+  table.integer('status_id');
+  table.integer('creator_id');
+  table.integer('executor_id');
 });
 
 exports.down = (knex) => knex.schema.dropTable('tasks');

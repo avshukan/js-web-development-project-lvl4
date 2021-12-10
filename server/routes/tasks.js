@@ -50,7 +50,10 @@ export default (app) => {
         if (!status) {
           throw new Error();
         }
-        const task = await app.objection.models.task.fromJson({ ...data, creatorId });
+        const jsonTask = {
+          ...data, creatorId, statusId: +data.statusId, executorId: +data.executorId,
+        };
+        const task = await app.objection.models.task.fromJson(jsonTask);
         await app.objection.models.task.query().insert(task);
         req.flash('success', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('page of tasks list'));
