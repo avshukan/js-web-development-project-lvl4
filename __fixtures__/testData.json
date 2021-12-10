@@ -1,4 +1,30 @@
 {
+  "tasks" : {
+    "standart": {
+      "name": "Standart Task",
+      "description": "Standart Task Description",
+      "statusId": 1,
+      "executorId": 0
+    },
+    "new": {
+      "name": "New Task",
+      "description": "New Task Description",
+      "statusId": 1,
+      "executorId": 4
+    },
+    "empty": {
+      "name": "",
+      "description": "Empty Task Description",
+      "statusId": 1,
+      "executorId": 1
+    },
+    "unrealStatus": {
+      "name": "Task with unreal Status Id",
+      "description": "Description for Task with unreal Status Id",
+      "statusId": 999,
+      "executorId": 1
+    }
+  },
   "statuses" : {
     "standart": {
       "name": "Standart"
@@ -17,20 +43,19 @@
     }
   },
   "users": {
-    "new": {
-      "firstName": "malika",
-      "lastName": "hodkiewicz75",
-      "email": "malika_hodkiewicz75@live.com",
-      "password": "RLJvaIgPOnX5r03"
-    },
     "existing": {
       "firstName": "lawrence",
       "lastName": "kulas87",
       "email": "lawrence.kulas87@outlook.com",
       "password": "O6AvLIQL1cbzrre"
     },
+    "new": {
+      "firstName": "malika",
+      "lastName": "hodkiewicz75",
+      "email": "malika_hodkiewicz75@live.com",
+      "password": "RLJvaIgPOnX5r03"
+    },
     "nonexistent": {
-      "id": 999,
       "firstName": "alexander",
       "lastName": "pushkin",
       "email": "alexander.pushkin@gmail.com",
