@@ -32,8 +32,20 @@ export default (app) => {
       return reply;
     })
 
-    .get('/tasks/:id/edit', { name: 'page to update task' }, async (_req, reply) => {
-      reply.redirect(app.reverse('root'));
+    .get('/tasks/:id/edit', { name: 'page to update task' }, async (req, reply) => {
+      if (!req.session.get('id')) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect(app.reverse('root'));
+        return reply;
+      }
+      const taskId = +req.params?.id;
+      const task = await app.objection.models.task.query().findById(taskId);
+      if (!task) {
+        req.flash('error', i18next.t('flash.tasks.edit.error'));
+        reply.redirect(app.reverse('page of tasks list'));
+        return reply;
+      }
+      reply.render('tasks/edit', { task, errors: {} });
       return reply;
     })
 
