@@ -276,7 +276,7 @@ describe('test statuses CRUD', () => {
       const taskAfter = await models.task.query().findOne({ id: standartTask.id });
       const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
       expect(response.statusCode).toBe(422);
-      expect(taskAfter).toMatchObject(standartParams);
+      expect(taskAfter).toMatchObject(standartTask);
       expect(countAfter).toBe(countBefore);
     });
 
@@ -292,7 +292,7 @@ describe('test statuses CRUD', () => {
       });
       const taskAfter = await models.task.query().findOne({ id: unrealTaskId });
       const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
-      expect(response.statusCode).toBe(422);
+      expect(response.statusCode).toBe(302);
       expect(taskAfter).toBeUndefined();
       expect(countAfter).toBe(countBefore);
     });
