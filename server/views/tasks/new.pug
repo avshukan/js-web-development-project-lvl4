@@ -7,6 +7,6 @@ block content
   +formFor()(action=route('create task') method='post')
     +input(task, 'name', t('views.tasks.labels.name'), errors)(type="text")
     +input(task, 'description', t('views.tasks.labels.description'), errors)(type="text")
-    +input(task, 'statusId', t('views.tasks.labels.statusId'), statusId, errors)(type="text")
-    +input(task, 'executorId', t('views.tasks.labels.executorId'), executorId, errors)(type="text")
+    +select(task, 'statusId', t('views.tasks.labels.statusId'), statuses, false, errors) 
+    +select(task, 'executorId', t('views.tasks.labels.executorId'), users, true, errors) 
     +submit(task)(value=t('views.tasks.new.submit'))
