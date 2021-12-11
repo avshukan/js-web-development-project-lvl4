@@ -22,7 +22,13 @@ export default (app) => {
         return reply;
       }
       const task = new app.objection.models.task();
-      reply.render('tasks/new', { task });
+      const statuses = await app.objection.models.status.query().orderBy('name');
+      const users = await app.objection.models.user.query().orderBy('first_name', 'last_name');
+      reply.render('tasks/new', {
+        task,
+        statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
+        users: users.map((item) => ({ id: item.id, text: `${item.firstName} ${item.lastName}` })),
+      });
       return reply;
     })
 
@@ -56,7 +62,13 @@ export default (app) => {
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       }
-      reply.render('tasks/edit', { task, errors: {} });
+      const statuses = await app.objection.models.status.query().orderBy('name');
+      const users = await app.objection.models.user.query().orderBy('first_name', 'last_name');
+      reply.render('tasks/edit', {
+        task,
+        statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
+        users: users.map((item) => ({ id: item.id, text: `${item.firstName} ${item.lastName}` })),
+      });
       return reply;
     })
 

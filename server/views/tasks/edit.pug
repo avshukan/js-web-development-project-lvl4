@@ -8,6 +8,6 @@ block content
     input(name='_method' type='hidden' value='patch')
     +input(task, 'name', t('views.tasks.labels.name'), errors)(type="text")
     +input(task, 'description', t('views.tasks.labels.description'), errors)(type="text")
-    +input(task, 'statusId', t('views.tasks.labels.statusId'), errors)(type="text")
-    +input(task, 'executorId', t('views.tasks.labels.executorId'), errors)(type="text")
+    +select(task, 'statusId', t('views.tasks.labels.statusId'), statuses, false, errors) 
+    +select(task, 'executorId', t('views.tasks.labels.executorId'), users, true, errors) 
     +submit(task)(value=t('views.tasks.edit.submit'))

@@ -29,3 +29,34 @@ mixin buttonTo(action, method)
   form(action=action, method="post")
     input(name="_method" type="hidden" value=method)
     input(type='submit')&attributes(attributes)
+
+mixin option(value, name, selectedValue)
+  if (value === selectedValue)
+    option(
+      value=value
+      selected="selected"
+    )= name
+  else
+    option(
+      value=value
+    )= name
+
+mixin select(entity, propertyName, labelText, options, allowBlank = true, errors = {})
+  - propertyErrors = _.get(errors, propertyName)
+  - classLine = 'form-control' + (_.isEmpty(errors) ? '' : ' is-invalid')
+  - inputId = getInputId(propertyName)
+  .mb-3(class=(errors[propertyName] && 'has-danger'))
+    label(
+      for= inputId
+    )= labelText
+    select(
+      id= inputId
+      name=getInputName(propertyName)
+      class=classLine
+    )&attributes(attributes)
+      if (allowBlank)
+        +option(0, "", _.get(entity, propertyName, ''))
+      each option in options
+        +option(option.id, option.text, _.get(entity, propertyName, ''))
+    if !_.isEmpty(propertyErrors)
+      .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
