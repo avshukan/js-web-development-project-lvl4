@@ -11,7 +11,21 @@ export default (app) => {
         return reply;
       }
       const tasks = await app.objection.models.task.query().orderBy('updatedAt', 'desc');
-      reply.render('tasks/list', { tasks });
+      const statuses = await app.objection.models.status.query();
+      const users = await app.objection.models.user.query();
+      reply.render('tasks/list', {
+        tasks: tasks.map((item) => {
+          const status = statuses.find(({ id }) => id === item.statusId);
+          const creator = users.find(({ id }) => id === item.creatorId);
+          const executor = users.find(({ id }) => id === item.executorId);
+          return {
+            ...item,
+            status: status.name,
+            creator: (creator) ? `${creator.firstName} ${creator.lastName}` : '',
+            executor: (executor) ? `${executor.firstName} ${executor.lastName}` : '',
+          };
+        }),
+      });
       return reply;
     })
 
@@ -45,7 +59,18 @@ export default (app) => {
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       }
-      reply.render('tasks/show', { task, errors: {} });
+      const status = await app.objection.models.status.query().findById(task.statusId);
+      const creator = await app.objection.models.user.query().findById(task.creatorId);
+      const executor = await app.objection.models.user.query().findById(task.executorId);
+      reply.render('tasks/show', {
+        task: {
+          ...task,
+          status: status.name,
+          creator: (creator) ? `${creator.firstName} ${creator.lastName}` : '',
+          executor: (executor) ? `${executor.firstName} ${executor.lastName}` : '',
+        },
+        errors: {},
+      });
       return reply;
     })
 

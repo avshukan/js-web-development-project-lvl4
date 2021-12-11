@@ -17,13 +17,13 @@ block content
         td= task.description
       tr
         td= t('views.tasks.labels.statusId')
-        td= task.statusId
+        td= task.status
       tr
         td= t('views.tasks.labels.creatorId')
-        td= task.creatorId
+        td= task.creator
       tr
         td= t('views.tasks.labels.executorId')
-        td= task.executorId
+        td= task.executor
       tr
         td= t('views.tasks.labels.createdAt')
         td= formatDate(task.createdAt)
