@@ -87,6 +87,12 @@ main
       if isAuthenticated()
         li.nav-item
           a.nav-link.link-dark(href='#')
+          a.nav-link.active(href=route('page of tasks list') aria-current='page')
+            svg.bi.me-2(width='16' height='16')
+              use(xlink:href='#table')
+            = t('layouts.application.tasks')
+        li.nav-item
+          a.nav-link.link-dark(href='#')
           a.nav-link.active(href=route('page of statuses list') aria-current='page')
             svg.bi.me-2(width='16' height='16')
               use(xlink:href='#grid')

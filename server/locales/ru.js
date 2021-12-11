@@ -47,11 +47,32 @@ module.exports = {
           success: 'Статус успешно удалён',
         },
       },
+      tasks: {
+        show: {
+          error: 'Не удалось загрузить задачу',
+        },
+        edit: {
+          error: 'Не удалось загрузить задачу',
+        },
+        create: {
+          error: 'Не удалось создать задачу',
+          success: 'Задача успешно создана',
+        },
+        update: {
+          error: 'Не удалось обновить задачу',
+          success: 'Задача успешно обновлёна',
+        },
+        delete: {
+          error: 'Не удалось удалить задачу',
+          success: 'Задача успешно удалёна',
+        },
+      },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
     },
     layouts: {
       application: {
         users: 'Пользователи',
+        tasks: 'Задачи',
         statuses: 'Статусы',
         account: 'Аккаунт',
         signIn: 'Вход',
@@ -91,6 +112,36 @@ module.exports = {
           labels: {
             name: 'Название',
           },
+        },
+      },
+      tasks: {
+        labels: {
+          id: 'ID',
+          name: 'Наименование',
+          description: 'Описание',
+          statusId: 'Статус',
+          creatorId: 'Автор',
+          executorId: 'Исполнитель',
+          createdAt: 'Дата создания',
+        },
+        controls: {
+          create: 'Добавить',
+          update: 'Редактировать',
+          delete: 'Удалить',
+        },
+        list: {
+          header: 'Список задач',
+        },
+        show: {
+          header: 'Карточка задачи',
+        },
+        new: {
+          header: 'Создание задачи',
+          submit: 'Создать',
+        },
+        edit: {
+          header: 'Редактирование задачи',
+          submit: 'Сохранить',
         },
       },
       users: {

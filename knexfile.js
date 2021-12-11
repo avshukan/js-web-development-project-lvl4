@@ -12,12 +12,22 @@ module.exports = {
     connection: {
       filename: './database.sqlite',
     },
+    pool: {
+      afterCreate(conn, cb) {
+        conn.run('PRAGMA foreign_keys = ON', cb);
+      },
+    },
     useNullAsDefault: true,
     migrations,
   },
   test: {
     client: 'sqlite3',
     connection: ':memory:',
+    pool: {
+      afterCreate(conn, cb) {
+        conn.run('PRAGMA foreign_keys = ON', cb);
+      },
+    },
     useNullAsDefault: true,
     migrations,
   },
@@ -25,6 +35,11 @@ module.exports = {
     client: 'sqlite3',
     connection: {
       filename: './database.sqlite',
+    },
+    pool: {
+      afterCreate(conn, cb) {
+        conn.run('PRAGMA foreign_keys = ON', cb);
+      },
     },
     useNullAsDefault: true,
     migrations,

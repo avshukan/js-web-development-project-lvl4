@@ -215,6 +215,9 @@ describe('test users CRUD', () => {
     const exisitngUsers = await models.user.query();
     const standartUsersCount = exisitngUsers.length;
 
+    // предварительно удаляем все задачи этого пользователя, чтобы не сработал constraint
+    await models.task.query().where('creatorId', exisitngUser.id).del();
+
     // signing in (auxiliary)
     const responseSignIn = await app.inject({
       method: 'POST',
@@ -296,6 +299,46 @@ describe('test users CRUD', () => {
     expect(nonexistentResponse.statusCode).toBe(302);
     expect(nonexistentData).toMatchObject(standartData);
     expect(nonexistentUsers.length).toBe(standartUsersCount);
+  });
+
+  it('fail: delete user with tasks', async () => {
+    const existingParams = testData.users.existing;
+    const exisitngUser = await models.user.query().findOne({ email: existingParams.email });
+    const exisitngUsers = await models.user.query();
+    const standartUsersCount = exisitngUsers.length;
+
+    // предварительно убеждаемся, что у пользователя есть задачи
+    const task = await models.task.query().where('creatorId', exisitngUser.id).first();
+    expect(task).toBeDefined();
+
+    // signing in (auxiliary)
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: existingParams,
+      },
+    });
+    expect(responseSignIn.statusCode).toBe(302);
+    // после успешной аутентификации получаем куки из ответа,
+    // они понадобятся для выполнения запросов на маршруты требующие
+    // предварительную аутентификацию
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    const cookies = { [name]: value };
+
+    // deleting existing user
+    const deleteResponse = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('delete user', { id: exisitngUser.id }),
+      // используем полученные ранее куки
+      cookies,
+    });
+    const deleteUser = await models.user.query().findOne({ id: exisitngUser.id });
+    const deleteUsers = await models.user.query();
+    expect(deleteResponse.statusCode).toBe(422);
+    expect(deleteUser).toMatchObject(exisitngUser);
+    expect(deleteUsers.length).toBe(standartUsersCount);
   });
 
   afterEach(async () => {
