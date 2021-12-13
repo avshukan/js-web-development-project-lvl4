@@ -9,7 +9,6 @@ describe('test labels CRUD', () => {
   let cookies;
   let unrealLabelId;
   let countBefore;
-  let labelBefore;
   const testData = getTestData();
 
   beforeAll(async () => {
@@ -40,18 +39,84 @@ describe('test labels CRUD', () => {
     const { name, value } = sessionCookie;
     cookies = { [name]: value };
     unrealLabelId = await models.label.query().max('id as max').first().then(({ max }) => max) + 1;
-    countBefore = await models.task.query().count('id', { as: 'count' }).then(([data]) => data.count);
-    // берём первую метку
-    labelBefore = await models.task.query().first();
-    // убеждаемся, что метка существует
-    expect(labelBefore).toBeDefined();
+    countBefore = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
   });
 
   describe('test label create', () => {
-    test.todo('success: create new label');
-    test.todo('fail: create new label without auth');
-    test.todo('fail: create new label with empty name');
-    test.todo('fail: create new label with nonunique name');
+    it('success: create new label', async () => {
+      const newParams = testData.labels.new;
+      const labelBefore = await models.label.query().findOne({ name: newParams.name });
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create label'),
+        payload: {
+          data: newParams,
+        },
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ name: newParams.name });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelBefore).toBeUndefined();
+      expect(labelAfter).toMatchObject(newParams);
+      expect(countAfter).toBe(countBefore + 1);
+    });
+
+    it('fail: create new label without auth', async () => {
+      const newParams = testData.labels.new;
+      const labelBefore = await models.label.query().findOne({ name: newParams.name });
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create label'),
+        payload: {
+          data: newParams,
+        },
+        // cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ name: newParams.name });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelBefore).toBeUndefined();
+      expect(labelAfter).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: create new label with empty name', async () => {
+      const emptyParams = testData.labels.empty;
+      const labelBefore = await models.label.query().findOne({ name: emptyParams.name });
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create label'),
+        payload: {
+          data: emptyParams,
+        },
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ name: emptyParams.name });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelBefore).toBeUndefined();
+      expect(labelAfter).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: create new label with nonunique name', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('create label'),
+        payload: {
+          data: { name: labelBefore.name },
+        },
+        cookies,
+      });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
   });
 
   describe('test label read', () => {
@@ -65,6 +130,10 @@ describe('test labels CRUD', () => {
   });
 
   describe('test label update', () => {
+    // берём первую метку
+    // labelBefore = await models.label.query().first();
+    // убеждаемся, что метка существует
+    // expect(labelBefore).toBeDefined();
     test.todo('success: update label');
     test.todo('fail: update label without auth');
     test.todo('fail: update label with empty name');
