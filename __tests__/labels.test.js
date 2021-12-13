@@ -120,13 +120,90 @@ describe('test labels CRUD', () => {
   });
 
   describe('test label read', () => {
-    test.todo('success: get page of labels list');
-    test.todo('fail: get page of labels list without auth');
-    test.todo('success: get page of create label');
-    test.todo('fail: get page of create label without auth');
-    test.todo('success: get page of update label');
-    test.todo('fail: get page of update label without auth');
-    test.todo('fail: get page of update label with unreal label id');
+    it('success: get page of labels list', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of labels list'),
+        cookies,
+      });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(200);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page of labels list without auth', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of labels list'),
+        // cookies,
+      });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('success: get page of create label', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of create label'),
+        cookies,
+      });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(200);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page of create label without auth', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of create label'),
+        // cookies,
+      });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('success: get page of update label', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of update label', { id: labelBefore.id }),
+        cookies,
+      });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(200);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page of update label without auth', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of update label', { id: labelBefore.id }),
+        cookies,
+      });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: get page of update label with unreal label id', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('page of update label', { id: unrealLabelId }),
+        cookies,
+      });
+      const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(countAfter).toBe(countBefore);
+    });
   });
 
   describe('test label update', () => {
