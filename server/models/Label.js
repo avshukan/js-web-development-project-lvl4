@@ -1,41 +1,39 @@
 // @ts-check
-
 import path from 'path';
 import { Model } from 'objection';
+import objectionUnique from 'objection-unique';
 
-export default class Task extends Model {
+const unique = objectionUnique({ fields: ['name'] });
+
+export default class Label extends unique(Model) {
   static get tableName() {
-    return 'tasks';
+    return 'labels';
   }
 
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['name', 'statusId', 'creatorId'],
+      required: ['name'],
       properties: {
         id: { type: 'integer' },
         name: { type: 'string', minLength: 1 },
-        description: { type: 'string' },
-        statusId: { type: 'integer' },
-        creatorId: { type: 'integer' },
-        executorId: { type: 'integer' },
       },
     };
   }
 
   static get relationMappings() {
     return {
-      labels: {
+      tasks: {
         relation: Model.ManyToManyRelation,
-        modelClass: path.join(__dirname, 'Label'),
+        modelClass: path.join(__dirname, 'Task'),
         join: {
-          from: 'label.id',
+          from: 'tasks.id',
           through: {
             // persons_movies is the join table.
-            from: 'tasks_labels.labelId',
-            to: 'tasks_labels.taskId',
+            from: 'tasks_labels.taskId',
+            to: 'tasks_labels.labelId',
           },
-          to: 'tasks.id',
+          to: 'labels.id',
         },
       },
     };
