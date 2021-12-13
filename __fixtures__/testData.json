@@ -1,5 +1,16 @@
 {
-  "tasks" : {
+  "labels": {
+    "standart": {
+      "name": "Standart Label"
+    },
+    "new": {
+      "name": "New Label"
+    },
+    "empty": {
+      "name": ""
+    }
+  },
+  "tasks": {
     "standart": {
       "name": "Standart Task",
       "description": "Standart Task Description",
@@ -25,7 +36,7 @@
       "executorId": 1
     }
   },
-  "statuses" : {
+  "statuses": {
     "standart": {
       "name": "Standart"
     },
@@ -43,6 +54,12 @@
     }
   },
   "users": {
+    "authUser": {
+      "firstName": "lawrence",
+      "lastName": "kulas87",
+      "email": "lawrence.kulas87@outlook.com",
+      "password": "O6AvLIQL1cbzrre"
+    },
     "existing": {
       "firstName": "lawrence",
       "lastName": "kulas87",
