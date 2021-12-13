@@ -74,6 +74,7 @@ module.exports = {
         users: 'Пользователи',
         tasks: 'Задачи',
         statuses: 'Статусы',
+        labels: 'Метки',
         account: 'Аккаунт',
         signIn: 'Вход',
         signUp: 'Регистрация',
@@ -90,6 +91,29 @@ module.exports = {
             email: 'Email',
             password: 'Пароль',
           },
+        },
+      },
+      labels: {
+        labels: {
+          id: 'ID',
+          name: 'Наименование',
+          createdAt: 'Дата создания',
+        },
+        controls: {
+          create: 'Добавить',
+          update: 'Редактировать',
+          delete: 'Удалить',
+        },
+        list: {
+          header: 'Список меток',
+        },
+        new: {
+          header: 'Создание метки',
+          submit: 'Создать',
+        },
+        edit: {
+          header: 'Редактирование метки',
+          submit: 'Сохранить',
         },
       },
       statuses: {

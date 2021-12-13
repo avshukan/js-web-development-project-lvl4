@@ -1,0 +1,27 @@
+extends ../layouts/application.pug
+
+block content
+  div
+    a(href=route('page to create label') class="btn nav-link")= t('views.labels.controls.create')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.labels.labels.id')
+        th= t('views.labels.labels.name')
+        th= t('views.labels.labels.createdAt')
+        th= t('views.labels.controls.update')
+        th= t('views.labels.controls.delete')
+    tbody
+      each label in labels
+        tr
+          td= label.id
+          td= label.name
+          td= label.description
+          td= label.status
+          td= label.creator
+          td= label.executor
+          td= formatDate(label.createdAt)
+          td
+            a(href=route('page to update label', {id: label.id}) class="btn nav-link")= t('views.labels.controls.update')
+          td
+            +buttonTo(route('delete label', { id: label.id }), 'delete')(class="btn nav-link" value=t('views.labels.controls.delete'))
