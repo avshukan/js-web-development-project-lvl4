@@ -16,10 +16,6 @@ block content
         tr
           td= label.id
           td= label.name
-          td= label.description
-          td= label.status
-          td= label.creator
-          td= label.executor
           td= formatDate(label.createdAt)
           td
             a(href=route('page of update label', {id: label.id}) class="btn nav-link")= t('views.labels.controls.update')

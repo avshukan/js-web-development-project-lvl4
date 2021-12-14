@@ -97,12 +97,12 @@ main
             svg.bi.me-2(width='16' height='16')
               use(xlink:href='#grid')
             = t('layouts.application.statuses')
-      li.nav-item
-        a.nav-link.link-dark(href='#')
-        a.nav-link.active(href=route('page of users list') aria-current='page')
-          svg.bi.me-2(width='16' height='16')
-            use(xlink:href='#speedometer2')
-          |           Dashboard
+        li.nav-item
+          a.nav-link.link-dark(href='#')
+          a.nav-link.active(href=route('page of labels list') aria-current='page')
+            svg.bi.me-2(width='16' height='16')
+              use(xlink:href='#tools')
+            = t('layouts.application.labels')
     hr
     .dropdown
       a#dropdownUser2.d-flex.align-items-center.link-dark.text-decoration-none.dropdown-toggle(href='#' data-bs-toggle='dropdown' aria-expanded='false')
