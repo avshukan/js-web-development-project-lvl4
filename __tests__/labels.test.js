@@ -312,10 +312,71 @@ describe('test labels CRUD', () => {
   });
 
   describe('test label delete', () => {
-    test.todo('success: delete label');
-    test.todo('fail: delete label without auth');
-    test.todo('fail: delete label with unreal label id');
-    test.todo('fail: delete label with tasks');
+    it('success: delete label', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete label', { id: labelBefore.id }),
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toBeUndefined();
+      expect(countAfter).toBe(countBefore - 1);
+    });
+
+    it('fail: delete label without auth', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete label', { id: labelBefore.id }),
+        // cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toMatchObject(labelBefore);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: delete label with unreal label id', async () => {
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete label', { id: unrealLabelId }),
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: unrealLabelId });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: delete label with tasks', async () => {
+      // берём первую метку (которая привязана к задачам)
+      const labelBefore = await models.label.query().whereExists(
+        models.label.relatedQuery('tasks').select(1),
+      ).first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('delete label', { id: labelBefore.id }),
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toMatchObject(labelBefore);
+      expect(countAfter).toBe(countBefore);
+    });
   });
 
   afterEach(async () => {
