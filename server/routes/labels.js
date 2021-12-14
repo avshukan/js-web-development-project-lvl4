@@ -65,7 +65,33 @@ export default (app) => {
       }
     })
 
-    .patch('/labels/:id', { name: 'update label' }, async (_req, reply) => reply.redirect(app.reverse('root')))
+    .patch('/labels/:id', { name: 'update label' }, async (req, reply) => {
+      if (!req.session.get('id')) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect(app.reverse('root'));
+        return reply;
+      }
+      const labelId = +req.params?.id;
+      const label = await app.objection.models.label.query().findById(labelId);
+      if (!label) {
+        req.flash('error', i18next.t('flash.labels.update.error'));
+        reply.redirect(app.reverse('page of labels list'));
+        return reply;
+      }
+      const { data } = req.body;
+      try {
+        await label.$query().update(data);
+        req.flash('success', i18next.t('flash.labels.update.success'));
+        reply.redirect(app.reverse('page of labels list'));
+        return reply;
+      } catch (error) {
+        console.log('error', error);
+        req.flash('error', i18next.t('flash.labels.update.error'));
+        reply.statusCode = 422;
+        reply.render('labels/edit', { label: { ...data, id: labelId }, errors: error.data });
+        return reply;
+      }
+    })
 
     .delete('/labels/:id', { name: 'delete label' }, async (_req, reply) => reply.redirect(app.reverse('root')));
 };

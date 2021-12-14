@@ -265,7 +265,7 @@ describe('test labels CRUD', () => {
       });
       const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
       const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
-      expect(response.statusCode).toBe(302);
+      expect(response.statusCode).toBe(422);
       expect(labelAfter).toMatchObject(labelBefore);
       expect(countAfter).toBe(countBefore);
     });
@@ -305,7 +305,7 @@ describe('test labels CRUD', () => {
       });
       const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
       const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
-      expect(response.statusCode).toBe(302);
+      expect(response.statusCode).toBe(422);
       expect(labelAfter).toMatchObject(labelBefore);
       expect(countAfter).toBe(countBefore);
     });

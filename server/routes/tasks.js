@@ -159,7 +159,7 @@ export default (app) => {
         return reply;
       } catch (error) {
         console.log('error', error);
-        req.flash('error', i18next.t('flash.statuses.update.error'));
+        req.flash('error', i18next.t('flash.tasks.update.error'));
         reply.statusCode = 422;
         reply.render('tasks/edit', { task: { ...data, id: taskId }, errors: error.data });
         return reply;
