@@ -187,7 +187,7 @@ describe('test labels CRUD', () => {
       const response = await app.inject({
         method: 'GET',
         url: app.reverse('page of update label', { id: labelBefore.id }),
-        cookies,
+        // cookies,
       });
       const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
       expect(response.statusCode).toBe(302);
