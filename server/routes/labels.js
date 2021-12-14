@@ -43,7 +43,27 @@ export default (app) => {
       return reply;
     })
 
-    .post('/labels', { name: 'create label' }, async (_req, reply) => reply.redirect(app.reverse('root')))
+    .post('/labels', { name: 'create label' }, async (req, reply) => {
+      if (!req.session.get('id')) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect(app.reverse('root'));
+        return reply;
+      }
+      const { data } = req.body;
+      try {
+        const label = await app.objection.models.label.fromJson(data);
+        await app.objection.models.label.query().insert(label);
+        req.flash('success', i18next.t('flash.labels.create.success'));
+        reply.redirect(app.reverse('page of labels list'));
+        return reply;
+      } catch (error) {
+        console.log('error', error);
+        req.flash('error', i18next.t('flash.labels.create.error'));
+        reply.statusCode = 422;
+        reply.render('labels/new', { label: data, errors: error.data });
+        return reply;
+      }
+    })
 
     .patch('/labels/:id', { name: 'update label' }, async (_req, reply) => reply.redirect(app.reverse('root')))
 

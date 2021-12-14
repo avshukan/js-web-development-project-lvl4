@@ -94,7 +94,7 @@ describe('test labels CRUD', () => {
       });
       const labelAfter = await models.label.query().findOne({ name: emptyParams.name });
       const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
-      expect(response.statusCode).toBe(302);
+      expect(response.statusCode).toBe(422);
       expect(labelBefore).toBeUndefined();
       expect(labelAfter).toBeUndefined();
       expect(countAfter).toBe(countBefore);
@@ -114,7 +114,7 @@ describe('test labels CRUD', () => {
         cookies,
       });
       const countAfter = await models.label.query().count('id', { as: 'count' }).then(([data]) => data.count);
-      expect(response.statusCode).toBe(302);
+      expect(response.statusCode).toBe(422);
       expect(countAfter).toBe(countBefore);
     });
   });
