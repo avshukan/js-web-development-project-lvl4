@@ -313,8 +313,11 @@ describe('test labels CRUD', () => {
 
   describe('test label delete', () => {
     it('success: delete label', async () => {
-      // берём первую метку
-      const labelBefore = await models.label.query().first();
+      // берём первую метку (у которой нет связанных задач)
+      const labelBefore = await models.label.query().whereNotExists(
+        models.label.relatedQuery('tasks').select(1),
+      ).first();
+      console.log('labelBefore', labelBefore);
       // убеждаемся, что метка существует
       expect(labelBefore).toBeDefined();
       const response = await app.inject({
@@ -330,8 +333,11 @@ describe('test labels CRUD', () => {
     });
 
     it('fail: delete label without auth', async () => {
-      // берём первую метку
-      const labelBefore = await models.label.query().first();
+      // берём первую метку (у которой нет связанных задач)
+      const labelBefore = await models.label.query().whereNotExists(
+        models.label.relatedQuery('tasks').select(1),
+      ).first();
+      console.log('labelBefore', labelBefore);
       // убеждаемся, что метка существует
       expect(labelBefore).toBeDefined();
       const response = await app.inject({

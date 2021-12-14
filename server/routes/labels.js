@@ -93,5 +93,36 @@ export default (app) => {
       }
     })
 
-    .delete('/labels/:id', { name: 'delete label' }, async (_req, reply) => reply.redirect(app.reverse('root')));
+    .delete('/labels/:id', { name: 'delete label' }, async (req, reply) => {
+      if (!req.session.get('id')) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect(app.reverse('root'));
+        return reply;
+      }
+      const labelId = +req.params?.id;
+      const label = await app.objection.models.label.query().findById(labelId);
+      if (!label) {
+        req.flash('error', i18next.t('flash.labels.delete.error'));
+        reply.redirect(app.reverse('page of labels list'));
+        return reply;
+      }
+      try {
+        console.log('try delete...');
+        console.log('label', label);
+        const tasksCount = await label.$relatedQuery('tasks').count('name', { as: 'count' }).then(([data]) => data.count);
+        console.log('tasksCount', tasksCount);
+        if (tasksCount > 0) {
+          throw new Error();
+        }
+        await app.objection.models.label.query().deleteById(labelId);
+        req.flash('success', i18next.t('flash.labels.delete.success'));
+        reply.redirect(app.reverse('page of labels list'));
+        return reply;
+      } catch (error) {
+        console.log('error', error);
+        req.flash('error', i18next.t('flash.labels.delete.error'));
+        reply.redirect(app.reverse('page of labels list'));
+        return reply;
+      }
+    });
 };

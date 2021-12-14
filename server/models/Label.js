@@ -29,7 +29,6 @@ export default class Label extends unique(Model) {
         join: {
           from: 'tasks.id',
           through: {
-            // persons_movies is the join table.
             from: 'tasks_labels.taskId',
             to: 'tasks_labels.labelId',
           },

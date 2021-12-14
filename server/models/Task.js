@@ -29,9 +29,8 @@ export default class Task extends Model {
         relation: Model.ManyToManyRelation,
         modelClass: path.join(__dirname, 'Label'),
         join: {
-          from: 'label.id',
+          from: 'labels.id',
           through: {
-            // persons_movies is the join table.
             from: 'tasks_labels.labelId',
             to: 'tasks_labels.taskId',
           },
