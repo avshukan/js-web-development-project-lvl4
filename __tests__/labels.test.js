@@ -207,14 +207,108 @@ describe('test labels CRUD', () => {
   });
 
   describe('test label update', () => {
-    // берём первую метку
-    // labelBefore = await models.label.query().first();
-    // убеждаемся, что метка существует
-    // expect(labelBefore).toBeDefined();
-    test.todo('success: update label');
-    test.todo('fail: update label without auth');
-    test.todo('fail: update label with empty name');
-    test.todo('fail: update label with nonunque name');
+    it('success: update label', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const newParams = testData.labels.new;
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update label', { id: labelBefore.id }),
+        payload: {
+          data: newParams,
+        },
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toMatchObject(newParams);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: update label without auth', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const newParams = testData.labels.new;
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update label', { id: labelBefore.id }),
+        payload: {
+          data: newParams,
+        },
+        // cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toMatchObject(labelBefore);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: update label with empty name', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const emptyParams = testData.labels.empty;
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update label', { id: labelBefore.id }),
+        payload: {
+          data: emptyParams,
+        },
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toMatchObject(labelBefore);
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: update label with unreal label id', async () => {
+      const newParams = testData.labels.new;
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update label', { id: unrealLabelId }),
+        payload: {
+          data: newParams,
+        },
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: unrealLabelId });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toBeUndefined();
+      expect(countAfter).toBe(countBefore);
+    });
+
+    it('fail: update label with nonunque name', async () => {
+      // берём первую метку
+      const labelBefore = await models.label.query().first();
+      // убеждаемся, что метка существует
+      expect(labelBefore).toBeDefined();
+      const existentLabel = await models.label.query().where('id', '<>', labelBefore.id).first();
+      console.log('labelBefore', labelBefore);
+      console.log('existentLabel', existentLabel);
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('update label', { id: labelBefore.id }),
+        payload: {
+          data: { name: existentLabel.name },
+        },
+        cookies,
+      });
+      const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
+      const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
+      expect(response.statusCode).toBe(302);
+      expect(labelAfter).toMatchObject(labelBefore);
+      expect(countAfter).toBe(countBefore);
+    });
   });
 
   describe('test label delete', () => {
