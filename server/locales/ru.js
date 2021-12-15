@@ -159,6 +159,7 @@ module.exports = {
           description: 'Описание',
           statusId: 'Статус',
           creatorId: 'Автор',
+          labels: 'Метки',
           executorId: 'Исполнитель',
           createdAt: 'Дата создания',
         },
