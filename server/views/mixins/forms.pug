@@ -31,7 +31,7 @@ mixin buttonTo(action, method)
     input(type='submit')&attributes(attributes)
 
 mixin option(value, name, selectedValue)
-  if (value === selectedValue)
+  if (value == selectedValue || (Array.isArray(selectedValue) && selectedValue.includes(value)))
     option(
       value=value
       selected="selected"
@@ -51,12 +51,12 @@ mixin select(entity, propertyName, labelText, options, allowBlank = true, errors
     )= labelText
     select(
       id= inputId
-      name=getInputName(propertyName)
-      class=classLine
+      name= getInputName(propertyName)
+      class= classLine
     )&attributes(attributes)
       if (allowBlank)
-        +option(0, "", _.get(entity, propertyName, ''))
-      each option in options
+        +option(0, '', _.get(entity, propertyName, ''))
+      each option in options || []
         +option(option.id, option.text, _.get(entity, propertyName, ''))
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')

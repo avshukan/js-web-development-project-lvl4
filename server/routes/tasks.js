@@ -1,5 +1,6 @@
 // @ts-check
 import i18next from 'i18next';
+import _ from 'lodash';
 
 export default (app) => {
   app
@@ -38,10 +39,12 @@ export default (app) => {
       const task = new app.objection.models.task();
       const statuses = await app.objection.models.status.query().orderBy('name');
       const users = await app.objection.models.user.query().orderBy('first_name', 'last_name');
+      const labels = await app.objection.models.label.query().orderBy('name');
       reply.render('tasks/new', {
         task,
         statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
         users: users.map((item) => ({ id: item.id, text: `${item.firstName} ${item.lastName}` })),
+        labels: labels.map((item) => ({ id: item.id, text: item.name })),
       });
       return reply;
     })
@@ -87,12 +90,18 @@ export default (app) => {
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       }
+      const relatedLabels = await task.$relatedQuery('labels');
       const statuses = await app.objection.models.status.query().orderBy('name');
       const users = await app.objection.models.user.query().orderBy('first_name', 'last_name');
+      const labels = await app.objection.models.label.query().orderBy('name');
       reply.render('tasks/edit', {
-        task,
+        task: {
+          ...task,
+          labels: relatedLabels.map((item) => item.id),
+        },
         statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
         users: users.map((item) => ({ id: item.id, text: `${item.firstName} ${item.lastName}` })),
+        labels: labels.map((item) => ({ id: item.id, text: item.name })),
       });
       return reply;
     })
@@ -111,10 +120,21 @@ export default (app) => {
           throw new Error();
         }
         const jsonTask = {
-          ...data, creatorId, statusId: +data.statusId, executorId: +data.executorId,
+          ...data,
+          creatorId,
+          statusId: +data.statusId,
+          executorId: +data.executorId,
         };
         const task = await app.objection.models.task.fromJson(jsonTask);
-        await app.objection.models.task.query().insert(task);
+        const relatedLabels = data.labels ? _.flatten([data.labels]).map((label) => +label) : [];
+        try {
+          await app.objection.models.task.transaction(async (trx) => {
+            await app.objection.models.task.query(trx).insert(task);
+            await Promise.all(relatedLabels.map((label) => task.$relatedQuery('labels', trx).relate(label)));
+          });
+        } catch (error) {
+          throw new Error(error);
+        }
         req.flash('success', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
@@ -122,7 +142,20 @@ export default (app) => {
         console.log('error', error);
         req.flash('error', i18next.t('flash.tasks.create.error'));
         reply.statusCode = 422;
-        reply.render('tasks/new', { task: data, errors: error.data });
+        const dataTask = {
+          ...data,
+          labels: data.labels ? _.flatten([data.labels]).map((label) => +label) : [],
+        };
+        const statuses = await app.objection.models.status.query().orderBy('name');
+        const users = await app.objection.models.user.query().orderBy('first_name', 'last_name');
+        const labels = await app.objection.models.label.query().orderBy('name');
+        reply.render('tasks/new', {
+          task: dataTask,
+          statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
+          users: users.map((item) => ({ id: item.id, text: `${item.firstName} ${item.lastName}` })),
+          labels: labels.map((item) => ({ id: item.id, text: item.name })),
+          errors: error.data,
+        });
         return reply;
       }
     })
@@ -153,15 +186,38 @@ export default (app) => {
           creatorId: task.creatorId,
           executorId: +data.executorId,
         };
-        await task.$query().update(jsonTask);
+        const relatedLabels = data.labels ? _.flatten([data.labels]).map((label) => +label) : [];
+        try {
+          await app.objection.models.task.transaction(async (trx) => {
+            await task.$query(trx).update(jsonTask);
+            await task.$relatedQuery('labels', trx).unrelate();
+            await Promise.all(relatedLabels.map((label) => task.$relatedQuery('labels', trx).relate(label)));
+          });
+        } catch (error) {
+          throw new Error(error);
+        }
         req.flash('success', i18next.t('flash.tasks.update.success'));
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       } catch (error) {
         console.log('error', error);
-        req.flash('error', i18next.t('flash.statuses.update.error'));
+        req.flash('error', i18next.t('flash.tasks.update.error'));
         reply.statusCode = 422;
-        reply.render('tasks/edit', { task: { ...data, id: taskId }, errors: error.data });
+        const dataTask = {
+          ...data,
+          id: taskId,
+          labels: data.labels ? _.flatten([data.labels]).map((label) => +label) : [],
+        };
+        const statuses = await app.objection.models.status.query().orderBy('name');
+        const users = await app.objection.models.user.query().orderBy('first_name', 'last_name');
+        const labels = await app.objection.models.label.query().orderBy('name');
+        reply.render('tasks/edit', {
+          task: dataTask,
+          statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
+          users: users.map((item) => ({ id: item.id, text: `${item.firstName} ${item.lastName}` })),
+          labels: labels.map((item) => ({ id: item.id, text: item.name })),
+          errors: error.data,
+        });
         return reply;
       }
     })
