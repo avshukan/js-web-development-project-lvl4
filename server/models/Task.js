@@ -1,4 +1,6 @@
 // @ts-check
+
+import path from 'path';
 import { Model } from 'objection';
 
 export default class Task extends Model {
@@ -17,6 +19,23 @@ export default class Task extends Model {
         statusId: { type: 'integer' },
         creatorId: { type: 'integer' },
         executorId: { type: 'integer' },
+      },
+    };
+  }
+
+  static get relationMappings() {
+    return {
+      labels: {
+        relation: Model.ManyToManyRelation,
+        modelClass: path.join(__dirname, 'Label'),
+        join: {
+          from: 'labels.id',
+          through: {
+            from: 'tasks_labels.labelId',
+            to: 'tasks_labels.taskId',
+          },
+          to: 'tasks.id',
+        },
       },
     };
   }

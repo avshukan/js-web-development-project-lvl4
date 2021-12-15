@@ -1,6 +1,6 @@
 {
    "name": "@hexlet/code",
-   "version": "0.5.0",
+   "version": "0.6.0",
    "description": "fastify-nodejs-application",
    "main": "server/index.js",
    "scripts": {

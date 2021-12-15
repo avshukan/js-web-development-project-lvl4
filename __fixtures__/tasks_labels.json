@@ -1,0 +1,22 @@
+[
+  {
+    "taskId": 1,
+    "labelId": 1
+  },
+  {
+    "taskId": 1,
+    "labelId": 2
+  },
+  {
+    "taskId": 2,
+    "labelId": 2
+  },
+  {
+    "taskId": 2,
+    "labelId": 3
+  },
+  {
+    "taskId": 2,
+    "labelId": 4
+  }
+]

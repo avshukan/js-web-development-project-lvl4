@@ -30,6 +30,20 @@ module.exports = {
           success: 'Пользователь успешно удалён',
         },
       },
+      labels: {
+        create: {
+          error: 'Не удалось создать метку',
+          success: 'Метка успешно создана',
+        },
+        update: {
+          error: 'Не удалось обновить метку',
+          success: 'Метка успешно обновлена',
+        },
+        delete: {
+          error: 'Не удалось удалить метку',
+          success: 'Метка успешно удалена',
+        },
+      },
       statuses: {
         create: {
           error: 'Не удалось создать статус',
@@ -74,6 +88,7 @@ module.exports = {
         users: 'Пользователи',
         tasks: 'Задачи',
         statuses: 'Статусы',
+        labels: 'Метки',
         account: 'Аккаунт',
         signIn: 'Вход',
         signUp: 'Регистрация',
@@ -90,6 +105,29 @@ module.exports = {
             email: 'Email',
             password: 'Пароль',
           },
+        },
+      },
+      labels: {
+        labels: {
+          id: 'ID',
+          name: 'Наименование',
+          createdAt: 'Дата создания',
+        },
+        controls: {
+          create: 'Добавить',
+          update: 'Редактировать',
+          delete: 'Удалить',
+        },
+        list: {
+          header: 'Список меток',
+        },
+        new: {
+          header: 'Создание метки',
+          submit: 'Создать',
+        },
+        edit: {
+          header: 'Редактирование метки',
+          submit: 'Сохранить',
         },
       },
       statuses: {
@@ -121,6 +159,7 @@ module.exports = {
           description: 'Описание',
           statusId: 'Статус',
           creatorId: 'Автор',
+          labels: 'Метки',
           executorId: 'Исполнитель',
           createdAt: 'Дата создания',
         },
