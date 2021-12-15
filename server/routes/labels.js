@@ -107,10 +107,7 @@ export default (app) => {
         return reply;
       }
       try {
-        console.log('try delete...');
-        console.log('label', label);
         const tasksCount = await label.$relatedQuery('tasks').count('name', { as: 'count' }).then(([data]) => data.count);
-        console.log('tasksCount', tasksCount);
         if (tasksCount > 0) {
           throw new Error();
         }
@@ -121,6 +118,7 @@ export default (app) => {
       } catch (error) {
         console.log('error', error);
         req.flash('error', i18next.t('flash.labels.delete.error'));
+        reply.statusCode = 422;
         reply.redirect(app.reverse('page of labels list'));
         return reply;
       }

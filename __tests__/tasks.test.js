@@ -348,7 +348,7 @@ describe('test tasks CRUD', () => {
       });
       const taskAfter = await models.task.query().findOne({ id: otherTask.id });
       const countAfter = await models.task.query().count('name', { as: 'count' }).then(([data]) => data.count);
-      expect(response.statusCode).toBe(302);
+      expect(response.statusCode).toBe(422);
       expect(taskAfter).toMatchObject(otherTask);
       expect(countAfter).toBe(countBefore);
     });

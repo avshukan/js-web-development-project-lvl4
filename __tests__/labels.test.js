@@ -293,8 +293,6 @@ describe('test labels CRUD', () => {
       // убеждаемся, что метка существует
       expect(labelBefore).toBeDefined();
       const existentLabel = await models.label.query().where('id', '<>', labelBefore.id).first();
-      console.log('labelBefore', labelBefore);
-      console.log('existentLabel', existentLabel);
       const response = await app.inject({
         method: 'PATCH',
         url: app.reverse('update label', { id: labelBefore.id }),
@@ -317,7 +315,6 @@ describe('test labels CRUD', () => {
       const labelBefore = await models.label.query().whereNotExists(
         models.label.relatedQuery('tasks').select(1),
       ).first();
-      console.log('labelBefore', labelBefore);
       // убеждаемся, что метка существует
       expect(labelBefore).toBeDefined();
       const response = await app.inject({
@@ -337,7 +334,6 @@ describe('test labels CRUD', () => {
       const labelBefore = await models.label.query().whereNotExists(
         models.label.relatedQuery('tasks').select(1),
       ).first();
-      console.log('labelBefore', labelBefore);
       // убеждаемся, что метка существует
       expect(labelBefore).toBeDefined();
       const response = await app.inject({
@@ -379,7 +375,7 @@ describe('test labels CRUD', () => {
       });
       const labelAfter = await models.label.query().findOne({ id: labelBefore.id });
       const countAfter = await models.label.query().count('name', { as: 'count' }).then(([data]) => data.count);
-      expect(response.statusCode).toBe(302);
+      expect(response.statusCode).toBe(422);
       expect(labelAfter).toMatchObject(labelBefore);
       expect(countAfter).toBe(countBefore);
     });
