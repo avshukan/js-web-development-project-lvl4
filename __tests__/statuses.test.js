@@ -331,7 +331,6 @@ describe('test statuses CRUD', () => {
       const statusBefore = await knex('statuses').whereExists(knex.select('*').from('tasks').whereRaw('statuses.id = tasks.status_id')).first();
       // убеждаемся, что в тестовых данных есть такой статус
       expect(statusBefore).toBeDefined();
-      console.log('statusBefore', statusBefore);
       const response = await app.inject({
         method: 'DELETE',
         url: app.reverse('delete status', { id: statusBefore.id }),

@@ -65,12 +65,14 @@ export default (app) => {
       const status = await app.objection.models.status.query().findById(task.statusId);
       const creator = await app.objection.models.user.query().findById(task.creatorId);
       const executor = await app.objection.models.user.query().findById(task.executorId);
+      const relatedLabels = await task.$relatedQuery('labels');
       reply.render('tasks/show', {
         task: {
           ...task,
           status: status.name,
           creator: (creator) ? `${creator.firstName} ${creator.lastName}` : '',
           executor: (executor) ? `${executor.firstName} ${executor.lastName}` : '',
+          labels: relatedLabels.map((label) => label.name),
         },
         errors: {},
       });
@@ -127,21 +129,16 @@ export default (app) => {
         };
         const task = await app.objection.models.task.fromJson(jsonTask);
         const relatedLabels = data.labels ? _.flatten([data.labels]).map((label) => +label) : [];
-        try {
-          await app.objection.models.task.transaction(async (trx) => {
-            await app.objection.models.task.query(trx).insert(task);
-            await Promise.all(relatedLabels.map((label) => task.$relatedQuery('labels', trx).relate(label)));
-          });
-        } catch (error) {
-          throw new Error(error);
-        }
+        await app.objection.models.task.transaction(async (trx) => {
+          await app.objection.models.task.query(trx).insert(task);
+          await Promise.all(relatedLabels.map((label) => task.$relatedQuery('labels', trx).relate(label)));
+        });
         req.flash('success', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       } catch (error) {
         console.log('error', error);
         req.flash('error', i18next.t('flash.tasks.create.error'));
-        reply.statusCode = 422;
         const dataTask = {
           ...data,
           labels: data.labels ? _.flatten([data.labels]).map((label) => +label) : [],
@@ -149,6 +146,7 @@ export default (app) => {
         const statuses = await app.objection.models.status.query().orderBy('name');
         const users = await app.objection.models.user.query().orderBy('first_name', 'last_name');
         const labels = await app.objection.models.label.query().orderBy('name');
+        reply.statusCode = 422;
         reply.render('tasks/new', {
           task: dataTask,
           statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
@@ -187,22 +185,17 @@ export default (app) => {
           executorId: +data.executorId,
         };
         const relatedLabels = data.labels ? _.flatten([data.labels]).map((label) => +label) : [];
-        try {
-          await app.objection.models.task.transaction(async (trx) => {
-            await task.$query(trx).update(jsonTask);
-            await task.$relatedQuery('labels', trx).unrelate();
-            await Promise.all(relatedLabels.map((label) => task.$relatedQuery('labels', trx).relate(label)));
-          });
-        } catch (error) {
-          throw new Error(error);
-        }
+        await app.objection.models.task.transaction(async (trx) => {
+          await task.$query(trx).update(jsonTask);
+          await task.$relatedQuery('labels', trx).unrelate();
+          await Promise.all(relatedLabels.map((label) => task.$relatedQuery('labels', trx).relate(label)));
+        });
         req.flash('success', i18next.t('flash.tasks.update.success'));
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       } catch (error) {
         console.log('error', error);
         req.flash('error', i18next.t('flash.tasks.update.error'));
-        reply.statusCode = 422;
         const dataTask = {
           ...data,
           id: taskId,
@@ -211,6 +204,7 @@ export default (app) => {
         const statuses = await app.objection.models.status.query().orderBy('name');
         const users = await app.objection.models.user.query().orderBy('first_name', 'last_name');
         const labels = await app.objection.models.label.query().orderBy('name');
+        reply.statusCode = 422;
         reply.render('tasks/edit', {
           task: dataTask,
           statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
@@ -240,13 +234,17 @@ export default (app) => {
         if (task.creatorId !== creatorId) {
           throw new Error();
         }
-        await app.objection.models.task.query().deleteById(taskId);
+        await app.objection.models.task.transaction(async (trx) => {
+          await task.$query(trx).delete();
+          await task.$relatedQuery('labels', trx).unrelate();
+        });
         req.flash('success', i18next.t('flash.tasks.delete.success'));
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       } catch (error) {
         console.log('error', error);
         req.flash('error', i18next.t('flash.tasks.delete.error'));
+        reply.statusCode = 422;
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       }

@@ -25,6 +25,12 @@ block content
         td= t('views.tasks.labels.executorId')
         td= task.executor
       tr
+        td= t('views.tasks.labels.labels')
+        td
+          ul
+            each label in task.labels
+              li= label
+      tr
         td= t('views.tasks.labels.createdAt')
         td= formatDate(task.createdAt)
       tr
