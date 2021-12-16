@@ -162,8 +162,10 @@ module.exports = {
           labels: 'Метки',
           executorId: 'Исполнитель',
           createdAt: 'Дата создания',
+          isCreatorUser: 'Мои задачи',
         },
         controls: {
+          filter: 'Показать',
           create: 'Добавить',
           update: 'Редактировать',
           delete: 'Удалить',

@@ -14,7 +14,18 @@ export default (app) => {
       const tasks = await app.objection.models.task.query().orderBy('updatedAt', 'desc');
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
+      const labels = await app.objection.models.label.query();
+      const filter = {
+        status: 1,
+        executor: 1,
+        label: 2,
+        isCreatorUser: true,
+      };
       reply.render('tasks/list', {
+        filter,
+        statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
+        users: users.map((item) => ({ id: item.id, text: `${item.firstName} ${item.lastName}` })),
+        labels: labels.map((item) => ({ id: item.id, text: item.name })),
         tasks: tasks.map((item) => {
           const status = statuses.find(({ id }) => id === item.statusId);
           const creator = users.find(({ id }) => id === item.creatorId);

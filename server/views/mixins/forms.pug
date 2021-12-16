@@ -22,6 +22,23 @@ mixin input(entity, propertyName, labelText, errors = {})
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
+mixin checkbox(entity, propertyName, labelText)
+  - inputId = getInputId(propertyName)
+  - classLine = 'form-check'
+  - value = _.get(entity, propertyName, '')
+  .mb-3(class=classLine)
+    input(
+      id= inputId
+      type="checkbox"
+      name=getInputName(propertyName)
+      class=classLine + '-input'
+      checked=value
+    )&attributes(attributes)
+    label(
+      for= inputId
+      class=classLine + '-label'
+    )= labelText
+
 mixin submit(form = null)
   input(class='btn btn-primary' type='submit')&attributes(attributes)
 
