@@ -3,6 +3,21 @@ extends ../layouts/application.pug
 block content
   div
     a(href=route('page to create task') class="btn nav-link")= t('views.tasks.controls.create')
+  div
+    .card
+      .card-body.p-2.bg-light= Hawaii
+        +formFor()(action=route('page of tasks list') method='get')
+          .row
+            .col
+              +select(filter, 'status', t('views.tasks.labels.statusId'), statuses, true, errors)
+            .col
+              +select(filter, 'executor', t('views.tasks.labels.executorId'), users, true, errors)
+            .col
+              +select(filter, 'label', t('views.tasks.labels.labels'), labels, true, errors)
+            .col
+              +checkbox(filter, 'isCreatorUser', t('views.tasks.labels.isCreatorUser'), errors)
+            .col
+              +submit()(value=t('views.tasks.controls.filter'))
   table.table.table-striped
     thead
       tr
