@@ -18,7 +18,20 @@ export default (app) => {
         label: query['data[label]'],
         isCreatorUser: !!query['data[isCreatorUser]'],
       };
-      const tasks = await app.objection.models.task.query().orderBy('updatedAt', 'desc');
+      let taskQuery = app.objection.models.task.query().withGraphJoined('[labels, status]');
+      if (filter.label) {
+        taskQuery = taskQuery.where('labels.id', filter.label);
+      }
+      if (filter.status) {
+        taskQuery = taskQuery.where('status.id', filter.status);
+      }
+      if (filter.executor) {
+        taskQuery = taskQuery.where('executorId', filter.executor);
+      }
+      if (filter.isCreatorUser) {
+        taskQuery = taskQuery.where('creatorId', req.session.get('id'));
+      }
+      const tasks = await taskQuery.orderBy('updatedAt', 'desc');
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
       const labels = await app.objection.models.label.query();
