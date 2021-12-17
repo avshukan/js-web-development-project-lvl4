@@ -11,10 +11,35 @@ export default (app) => {
         reply.redirect(app.reverse('root'));
         return reply;
       }
-      const tasks = await app.objection.models.task.query().orderBy('updatedAt', 'desc');
+      const { query } = req;
+      const filter = {
+        status: query['data[status]'],
+        executor: query['data[executor]'],
+        label: query['data[label]'],
+        isCreatorUser: !!query['data[isCreatorUser]'],
+      };
+      let taskQuery = app.objection.models.task.query().withGraphJoined('[labels, status]');
+      if (filter.label) {
+        taskQuery = taskQuery.where('labels.id', filter.label);
+      }
+      if (filter.status) {
+        taskQuery = taskQuery.where('status.id', filter.status);
+      }
+      if (filter.executor) {
+        taskQuery = taskQuery.where('executorId', filter.executor);
+      }
+      if (filter.isCreatorUser) {
+        taskQuery = taskQuery.where('creatorId', req.session.get('id'));
+      }
+      const tasks = await taskQuery.orderBy('updatedAt', 'desc');
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
+      const labels = await app.objection.models.label.query();
       reply.render('tasks/list', {
+        filter,
+        statuses: statuses.map((item) => ({ id: item.id, text: item.name })),
+        users: users.map((item) => ({ id: item.id, text: `${item.firstName} ${item.lastName}` })),
+        labels: labels.map((item) => ({ id: item.id, text: item.name })),
         tasks: tasks.map((item) => {
           const status = statuses.find(({ id }) => id === item.statusId);
           const creator = users.find(({ id }) => id === item.creatorId);

@@ -8,7 +8,7 @@ const app = getApp();
 
 app.listen(port, host, (error, address) => {
   console.log(`Server is running on port: ${port}`);
-  console.log(`wsl hint: http://172.23.132.162:${port}`);
+  console.log(`wsl hint: http://172.17.137.19:${port}`);
   if (error) {
     console.log('address', address);
     app.log.error(error);
