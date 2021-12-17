@@ -72,7 +72,7 @@ mixin select(entity, propertyName, labelText, options, allowBlank = true, errors
       class= classLine
     )&attributes(attributes)
       if (allowBlank)
-        +option(0, '', _.get(entity, propertyName, ''))
+        option
       each option in options || []
         +option(option.id, option.text, _.get(entity, propertyName, ''))
     if !_.isEmpty(propertyErrors)
