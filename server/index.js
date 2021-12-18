@@ -17,10 +17,11 @@ import fastifyObjectionjs from 'fastify-objectionjs';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
+import middie from 'middie';
+import Rollbar from 'rollbar';
 import ru from './locales/ru.js';
 // @ts-ignore
 import webpackConfig from '../webpack.config.babel.js';
-
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
 import knexConfig from '../knexfile.js';
@@ -120,6 +121,15 @@ const registerPlugins = (app) => {
   });
 };
 
+async function addRollbar(app) {
+  const rollbar = new Rollbar({
+    accessToken: process.env.ROLLBAR_KEY,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
+  app.use(rollbar.errorHandler());
+}
+
 export default () => {
   const app = fastify({
     logger: {
@@ -133,6 +143,11 @@ export default () => {
   setUpViews(app);
   setUpStaticAssets(app);
   addRoutes(app);
+  app
+    // .register(require('middie'))
+    .register(middie)
+    .register(addRollbar);
+
   addHooks(app);
 
   return app;
