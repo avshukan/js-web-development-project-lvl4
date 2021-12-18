@@ -162,7 +162,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.tasks.create.error'));
         const dataTask = {
           ...data,
@@ -219,7 +219,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.tasks.update.error'));
         const dataTask = {
           ...data,
@@ -267,7 +267,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of tasks list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.tasks.delete.error'));
         reply.statusCode = 422;
         reply.redirect(app.reverse('page of tasks list'));
