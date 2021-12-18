@@ -49,7 +49,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of statuses list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.statuses.create.error'));
         reply.statusCode = 422;
         reply.render('statuses/new', { status: data, errors: error.data });
@@ -76,7 +76,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of statuses list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.statuses.update.error'));
         reply.statusCode = 422;
         reply.render('statuses/edit', { status: { ...data, id }, errors: error.data });
@@ -102,7 +102,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of statuses list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.statuses.delete.error'));
         reply.statusCode = 422;
         reply.redirect(app.reverse('page of statuses list'));
