@@ -10,3 +10,7 @@ jobs:
     steps:
       - name: test1
         run: echo ${{ env.resourceGroup1 }}
+      - name: test2
+        run: echo ${{ secrets.HEXLET_ID }}
+      - name: test2
+        run: echo ${{ secrets.ROLLBAR_KEY }}
