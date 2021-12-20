@@ -20,10 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
+        with:
+          SESSION_KEY: ${{ secrets.SESSION_KEY }}
+          ROLLBAR_KEY: ${{ secrets.ROLLBAR_KEY }}
+          
       - name: Hexlet project check
         uses: hexlet/project-action@release
         with:
           hexlet-id: ${{ secrets.HEXLET_ID }}
-          SESSION_KEY: ${{ secrets.SESSION_KEY }}
-          ROLLBAR_KEY: ${{ secrets.ROLLBAR_KEY }}
