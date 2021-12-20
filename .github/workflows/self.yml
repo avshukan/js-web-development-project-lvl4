@@ -1,0 +1,12 @@
+on: [push]
+name: variable substitution in json
+
+env:
+  resourceGroup1: ${ROLLBAR-KEY}-${SESSION_KEY}
+
+jobs:
+  foo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test1
+        run: echo ${{ env.resourceGroup1 }}
