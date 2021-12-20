@@ -25,3 +25,5 @@ jobs:
         uses: hexlet/project-action@release
         with:
           hexlet-id: ${{ secrets.HEXLET_ID }}
+          SESSION_KEY: ${{ secrets.SESSION_KEY }}
+          ROLLBAR_KEY: ${{ secrets.ROLLBAR_KEY }}
