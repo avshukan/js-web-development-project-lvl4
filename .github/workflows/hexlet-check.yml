@@ -40,9 +40,20 @@ jobs:
           directory: .
           file_name: .env
           
+      - name: Create env2 file
+        run: |
+          touch .env2
+          echo API_ENDPOINT="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env2
+          echo API_KEY=${{ secrets.API_KEY }} >> .env2
+          cat .env2
+          
       - name: Hexlet project check
         uses: hexlet/project-action@release
         with:
           hexlet-id: ${{ secrets.HEXLET_ID }}
+          
+      - name: Show env2 file
+        run: |
+          cat .env2
           
 
