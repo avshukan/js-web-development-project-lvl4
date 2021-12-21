@@ -14,15 +14,15 @@ on:
       - '**'
     tags:
       - '**'
+env:
+  SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF"
+  ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF"
-          ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF"
           
       - name: Hexlet project check
         uses: hexlet/project-action@release
