@@ -43,9 +43,9 @@ jobs:
       - name: Create env file
         run: |
           touch .env
-          echo SESSION_KEY: ${{ secrets.SESSION_KEY }} >> .env
+          echo S_KEY: ${{ secrets.SESSION_KEY }} >> .env
+          echo SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF" >> .env
           echo ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF" >> .env
-          echo API_KEY=${{ secrets.API_KEY }} >> .env2
           cat .env
 
       - name: Hexlet project check
