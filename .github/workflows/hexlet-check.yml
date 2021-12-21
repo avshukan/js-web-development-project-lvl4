@@ -28,18 +28,18 @@ jobs:
       - run: |
           echo "Test SESSION_KEY: ${{ secrets.SESSION_KEY }}"
           echo "Test TEST_ENV: ${{ env.TEST_ENV }}"
-      
-      - name: Make envfile
-        uses: SpicyPizza/create-envfile@v1
-        with:
-          envkey_SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF"
-          envkey_ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF"
-          SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF"
-          ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF"
-          envkey_SECRET_KEY: ${{ secrets.SESSION_KEY }}
-          directory: .
-          file_name: .env
-          
+
+#      - name: Make envfile
+#        uses: SpicyPizza/create-envfile@v1
+#        with:
+#          envkey_SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF"
+#          envkey_ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF"
+#          SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF"
+#          ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF"
+#          envkey_SECRET_KEY: ${{ secrets.SESSION_KEY }}
+#          directory: .
+#          file_name: .env
+
       - name: Create env file
         run: |
           touch .env
@@ -47,14 +47,14 @@ jobs:
           echo ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF" >> .env
           echo API_KEY=${{ secrets.API_KEY }} >> .env2
           cat .env
-          
+
       - name: Hexlet project check
         uses: hexlet/project-action@release
         with:
           hexlet-id: ${{ secrets.HEXLET_ID }}
-          
+
       - name: Show env2 file
         run: |
           cat .env2
-          
+
 
