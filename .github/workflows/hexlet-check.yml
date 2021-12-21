@@ -40,12 +40,13 @@ jobs:
           directory: .
           file_name: .env
           
-      - name: Create env2 file
+      - name: Create env file
         run: |
-          touch .env2
-          echo API_ENDPOINT="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env2
+          touch .env
+          echo SESSION_KEY: ${{ secrets.SESSION_KEY }} >> .env
+          echo ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF" >> .env
           echo API_KEY=${{ secrets.API_KEY }} >> .env2
-          cat .env2
+          cat .env
           
       - name: Hexlet project check
         uses: hexlet/project-action@release
