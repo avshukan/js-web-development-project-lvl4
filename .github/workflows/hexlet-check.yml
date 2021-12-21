@@ -17,6 +17,7 @@ on:
 env:
   SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF"
   ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF"
+  TEST_ENV: ${{ secrets.SESSION_KEY }}
 
 jobs:
   build:
@@ -28,3 +29,7 @@ jobs:
         uses: hexlet/project-action@release
         with:
           hexlet-id: ${{ secrets.HEXLET_ID }}
+          
+      - run: |
+          echo "Test SESSION_KEY: ${{ secrets.SESSION_KEY }}"
+          echo "Test TEST_ENV: ${{ env.TEST_ENV }}"
