@@ -21,8 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          SESSION_KEY: ${{ secrets.SESSION_KEY }}
-          ROLLBAR_KEY: ${{ secrets.ROLLBAR_KEY }}
+          SESSION_KEY: "0123456789ABCDEF0123456789ABCDEF"
+          ROLLBAR_KEY: "0123456789ABCDEF0123456789ABCDEF"
           
       - name: Hexlet project check
         uses: hexlet/project-action@release
