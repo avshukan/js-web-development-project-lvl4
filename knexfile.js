@@ -6,18 +6,33 @@ const migrations = {
   directory: path.join(__dirname, 'server', 'migrations'),
 };
 
+const {
+  LOCAL_PG_HOST,
+  LOCAL_PG_PORT,
+  LOCAL_PG_BASE,
+  LOCAL_PG_USER,
+  LOCAL_PG_PASS,
+  DATABASE_URL,
+} = process.env;
+
 module.exports = {
   development: {
-    client: 'sqlite3',
+    client: 'pg',
     connection: {
-      filename: './database.sqlite',
+      host: LOCAL_PG_HOST,
+      port: LOCAL_PG_PORT,
+      database: LOCAL_PG_BASE,
+      user: LOCAL_PG_USER,
+      password: LOCAL_PG_PASS,
     },
     pool: {
-      afterCreate(conn, cb) {
-        conn.run('PRAGMA foreign_keys = ON', cb);
+      afterCreate: (conn, done) => {
+        console.log('Pool created');
+        done(false, conn);
       },
     },
-    useNullAsDefault: true,
+    debug: true,
+    acquireConnectionTimeout: 2000,
     migrations,
   },
   test: {
@@ -32,16 +47,15 @@ module.exports = {
     migrations,
   },
   production: {
-    client: 'sqlite3',
+    client: 'pg',
     connection: {
-      filename: './database.sqlite',
+      url: DATABASE_URL,
+      charset: 'utf8',
     },
     pool: {
-      afterCreate(conn, cb) {
-        conn.run('PRAGMA foreign_keys = ON', cb);
-      },
+      min: 2,
+      max: 10,
     },
-    useNullAsDefault: true,
     migrations,
   },
 };

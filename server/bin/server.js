@@ -7,6 +7,7 @@ const host = (process.env.MODE === 'DEV') ? 'localhost' : '0.0.0.0';
 const app = getApp();
 
 app.listen(port, host, (error, address) => {
+  console.log('NODE_ENV', process.env.NODE_ENV);
   console.log(`Server is running on port: ${port}`);
   console.log(`wsl hint: http://172.23.132.162:${port}`);
   if (error) {
