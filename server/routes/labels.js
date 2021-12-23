@@ -57,7 +57,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of labels list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.labels.create.error'));
         reply.statusCode = 422;
         reply.render('labels/new', { label: data, errors: error.data });
@@ -85,7 +85,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of labels list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.labels.update.error'));
         reply.statusCode = 422;
         reply.render('labels/edit', { label: { ...data, id: labelId }, errors: error.data });
@@ -116,7 +116,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of labels list'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         req.flash('error', i18next.t('flash.labels.delete.error'));
         reply.statusCode = 422;
         reply.redirect(app.reverse('page of labels list'));

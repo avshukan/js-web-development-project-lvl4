@@ -25,6 +25,14 @@ export default class Task extends Model {
 
   static get relationMappings() {
     return {
+      status: {
+        relation: Model.HasOneRelation,
+        modelClass: path.join(__dirname, 'Status'),
+        join: {
+          from: 'tasks.statusId',
+          to: 'statuses.id',
+        },
+      },
       labels: {
         relation: Model.ManyToManyRelation,
         modelClass: path.join(__dirname, 'Label'),

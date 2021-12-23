@@ -21,7 +21,7 @@ export default (app) => {
         reply.redirect(app.reverse('root'));
         return reply;
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         const { data } = error;
         req.flash('error', i18next.t('flash.users.create.error'));
         reply.statusCode = 422;
@@ -65,7 +65,7 @@ export default (app) => {
         reply.redirect(app.reverse('page of users list'));
         return reply;
       } catch (error) {
-        console.log('patch error', error);
+        console.error('patch error', error);
         req.flash('error', i18next.t('flash.users.update.error'));
         reply.statusCode = 422;
         reply.render('users/edit', { user: { ...req.body.data, id }, errors: error.data });
