@@ -10,7 +10,6 @@ const rollbar = new Rollbar({
 
 const port = process.env.PORT || 5000;
 const host = (process.env.MODE === 'DEV') ? 'localhost' : '0.0.0.0';
-const app = getApp();
 
 app.listen(port, host, (error, address) => {
   rollbar.log('Hello world!');

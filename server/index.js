@@ -90,6 +90,11 @@ const registerPlugins = (app) => {
   app.register(fastifyErrorPage);
   app.register(fastifyReverseRoutes);
   app.register(fastifyFormbody, { parser: qs.parse });
+  console.log({
+    secret: process.env.SESSION_KEY,
+    cookie: {
+      path: '/',
+    }});
   app.register(fastifySecureSession, {
     secret: process.env.SESSION_KEY,
     cookie: {
