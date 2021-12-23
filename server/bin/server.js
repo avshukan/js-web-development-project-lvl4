@@ -14,6 +14,7 @@ const app = getApp();
 
 app.listen(port, host, (error, address) => {
   rollbar.log('Hello world!');
+  console.log('NODE_ENV', process.env.NODE_ENV);
   console.log(`Server is running on port: ${port}`);
   console.log(`wsl hint: http://172.17.137.19:${port}`);
   if (error) {
