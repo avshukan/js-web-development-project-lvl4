@@ -48,16 +48,8 @@ module.exports = {
   production: {
     client: 'pg',
     connection: {
-      host: PG_HOST,
-      port: PG_PORT,
-      database: PG_BASE,
-      user: PG_USER,
-      password: PG_PASS,
-      charset: 'utf8',
-    },
-    pool: {
-      min: 2,
-      max: 10,
+      connectionString : process.env.DATABASE_URL,
+      ssl: false
     },
     migrations,
   },
