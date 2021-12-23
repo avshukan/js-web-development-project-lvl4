@@ -7,23 +7,22 @@ const migrations = {
 };
 
 const {
-  LOCAL_PG_HOST,
-  LOCAL_PG_PORT,
-  LOCAL_PG_BASE,
-  LOCAL_PG_USER,
-  LOCAL_PG_PASS,
-  DATABASE_URL,
+  PG_HOST,
+  PG_PORT,
+  PG_BASE,
+  PG_USER,
+  PG_PASS,
 } = process.env;
 
 module.exports = {
   development: {
     client: 'pg',
     connection: {
-      host: LOCAL_PG_HOST,
-      port: LOCAL_PG_PORT,
-      database: LOCAL_PG_BASE,
-      user: LOCAL_PG_USER,
-      password: LOCAL_PG_PASS,
+      host: PG_HOST,
+      port: PG_PORT,
+      database: PG_BASE,
+      user: PG_USER,
+      password: PG_PASS,
     },
     pool: {
       afterCreate: (conn, done) => {
@@ -49,7 +48,11 @@ module.exports = {
   production: {
     client: 'pg',
     connection: {
-      url: DATABASE_URL,
+      host: PG_HOST,
+      port: PG_PORT,
+      database: PG_BASE,
+      user: PG_USER,
+      password: PG_PASS,
       charset: 'utf8',
     },
     pool: {

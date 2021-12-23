@@ -94,7 +94,8 @@ const registerPlugins = (app) => {
     secret: process.env.SESSION_KEY,
     cookie: {
       path: '/',
-    }});
+    },
+  });
   app.register(fastifySecureSession, {
     secret: process.env.SESSION_KEY,
     cookie: {
