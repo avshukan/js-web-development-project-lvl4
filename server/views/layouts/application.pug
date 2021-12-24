@@ -84,6 +84,16 @@ main
           svg.bi.me-2(width='16' height='16')
             use(xlink:href='#people-circle')
           = t('layouts.application.users')
+      li.nav-item
+        a.nav-link.active(href=route('page of users list') aria-current='page')
+          svg.bi.me-2(width='16' height='16')
+            use(xlink:href='#people-circle')
+          = t('layouts.application.signIn')
+      li.nav-item
+        a.nav-link.active(href=route('page of users list') aria-current='page')
+          svg.bi.me-2(width='16' height='16')
+            use(xlink:href='#people-circle')
+          = t('layouts.application.signUp')
       if isAuthenticated()
         li.nav-item
           a.nav-link.link-dark(href='#')
